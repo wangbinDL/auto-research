@@ -27,7 +27,7 @@
 |------|------|
 | 目标检测 | Ultralytics YOLO26 |
 | 语义分割 | HuggingFace Transformers + Mask2Former |
-| Agent 编排 | LangGraph v0.3 |
+| Agent 编排 | LangGraph v1.2.x |
 | 搜索策略 | AIDE 式树搜索 |
 | LLM 训练 | ms-swift v4 + DeepSpeed ZeRO-3 |
 | 实验追踪 | Weights & Biases |
