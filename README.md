@@ -2,6 +2,14 @@
 
 > 让 AI 自动做 CV 科研（目标检测/语义分割），录制完整决策轨迹，训练下一代 Qwen 模型。
 
+---
+
+**新人必读：** 请先阅读完整项目方案文档 👉 [Auto Research 项目方案（HTML）](https://htmlpreview.github.io/?https://github.com/wangbinDL/auto-research/blob/main/docs/project_plan.html)
+
+阅读后请在 [`coordination/feedback/`](coordination/feedback/) 目录下填写本周反馈文档。
+
+---
+
 ## 项目目标
 
 用 3 个月时间，4 人团队 + 64 GPU，搭建 Auto Research 闭环系统：
@@ -11,15 +19,7 @@
 
 ## 系统架构
 
-```
-吴凡(M1+M2)          何天尧(M3+M4)         栗维鸿(M5+M6)        负责人(M7)
-实验底座              Agent 核心             数据炼金              质量门禁
-                          │                      │                    │
-experiment_spec.yaml ◄────┤                      │                    │
-experiment_result.json ───►│                      │                    │
-                          │── trajectory.jsonl ──►│                    │
-                          │                      │── model_manifest ──►│
-```
+![Auto Research 系统架构](docs/architecture.png)
 
 ## 技术栈（2026.05 验证）
 
@@ -112,6 +112,57 @@ cd ../scripts && bash run_detection_baseline.sh
 - **每周五 Demo**：各模块最新版联调，只看能跑的系统
 - **每 2 周 Sprint Review**：里程碑检查 + 下阶段规划
 - **接口变更**：任何 field 变动需 4 人确认
+
+### Git 分支规范
+
+**分支权限：**
+- `main` 分支：仅负责人有 push 权限，其他人通过 PR 合入
+- 个人分支：各自自由 push
+
+**分支命名：**
+
+| 成员 | 分支名 |
+|------|--------|
+| 何天尧 | `dev_tianyao` |
+| 栗维鸿 | `dev_weihong` |
+| 吴凡 | `dev_wufan` |
+
+**首次创建分支：**
+
+```bash
+# 1. Clone 仓库
+git clone https://github.com/wangbinDL/auto-research.git
+cd auto-research
+
+# 2. 创建并切换到自己的分支
+git checkout -b dev_tianyao   # 何天尧
+# git checkout -b dev_weihong  # 栗维鸿
+# git checkout -b dev_wufan    # 吴凡
+
+# 3. 推送分支到远程
+git push -u origin dev_tianyao
+```
+
+**日常开发流程：**
+
+```bash
+# 在自己分支上开发
+git add .
+git commit -m "简要说明改了什么"
+git push
+
+# 每周五：提交 PR 合入 main
+# 1. 先同步 main 的最新代码
+git fetch origin
+git rebase origin/main
+
+# 2. 在 GitHub 上创建 Pull Request：dev_tianyao → main
+# 3. 等负责人 review 后合入
+```
+
+### 周反馈
+
+阅读完项目文档后，请在 [`coordination/feedback/`](coordination/feedback/) 填写本周反馈，模板已准备好。
 
 ## License
 
