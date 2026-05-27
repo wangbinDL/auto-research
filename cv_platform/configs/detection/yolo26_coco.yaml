@@ -1,0 +1,38 @@
+# YOLO26 COCO 检测 Baseline 配置
+# Owner: 吴凡 (M1)
+
+task: detect
+mode: train
+
+model:
+  backbone: yolo26-n
+  pretrained: true
+
+data:
+  path: /data/coco
+  train: train2017
+  val: val2017
+
+train:
+  epochs: 100
+  imgsz: 640
+  batch: 64
+  optimizer: AdamW
+  lr0: 0.001
+  weight_decay: 0.05
+  warmup_epochs: 3
+  cos_lr: true
+  close_mosaic: 10
+
+augment:
+  hsv_h: 0.015
+  hsv_s: 0.7
+  hsv_v: 0.4
+  mosaic: 1.0
+  mixup: 0.1
+  copy_paste: 0.1
+
+eval:
+  val_interval: 5
+  save_best: true
+  metric: mAP50-95

@@ -1,0 +1,39 @@
+# Mask2Former ADE20K 语义分割 Baseline 配置
+# Owner: 吴凡 (M1)
+
+task: semantic_segmentation
+mode: train
+
+model:
+  name: facebook/mask2former-swin-base-ade-semantic
+  backbone: swin-base
+  pretrained: true
+
+data:
+  dataset: ade20k
+  path: /data/ade20k
+  num_classes: 150
+  train_split: training
+  val_split: validation
+
+train:
+  epochs: 50
+  batch_size: 4
+  gradient_accumulation_steps: 4
+  optimizer: AdamW
+  learning_rate: 0.0001
+  weight_decay: 0.01
+  warmup_ratio: 0.05
+  lr_scheduler: polynomial
+  fp16: true
+
+augment:
+  random_crop: [512, 512]
+  random_flip: true
+  color_jitter: 0.4
+  random_scale: [0.5, 2.0]
+
+eval:
+  val_interval: 5
+  metric: mIoU
+  save_best: true

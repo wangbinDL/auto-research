@@ -1,0 +1,84 @@
+# 接口 1a: experiment_spec.yaml
+# 方向: Agent (何天尧) → CV平台 (吴凡)
+# 用途: Agent 提交实验请求给 CV 平台执行
+# 版本: v0.1 (W3 冻结)
+
+type: object
+required:
+  - experiment_id
+  - task_type
+  - framework
+  - dataset
+  - config_path
+  - work_dir
+  - gpu
+  - max_hours
+  - seed
+
+properties:
+  experiment_id:
+    type: string
+    description: 唯一实验标识符
+    example: "exp_000123"
+
+  task_type:
+    type: string
+    enum: [detection, segmentation]
+    description: 任务类型
+
+  framework:
+    type: string
+    enum: [ultralytics, huggingface]
+    description: 训练框架 (检测用ultralytics, 分割用huggingface)
+
+  dataset:
+    type: string
+    enum: [coco, ade20k, cityscapes]
+    description: 数据集名称
+
+  config_path:
+    type: string
+    description: 相对于 cv_platform/configs/ 的配置文件路径
+    example: "detection/yolo26_coco.yaml"
+
+  config_overrides:
+    type: object
+    description: 覆盖配置中的特定字段
+    example:
+      model.backbone: "yolo26-l"
+      train.epochs: 50
+
+  work_dir:
+    type: string
+    description: 实验输出目录
+    example: "/runs/exp_000123"
+
+  gpu:
+    type: integer
+    minimum: 1
+    maximum: 16
+    description: 请求 GPU 数量
+
+  max_hours:
+    type: number
+    minimum: 0.5
+    maximum: 24
+    description: 最大运行时间（超时自动 kill）
+
+  seed:
+    type: integer
+    description: 随机种子（保证可复现）
+    example: 42
+
+  priority:
+    type: string
+    enum: [low, normal, high]
+    default: normal
+    description: 调度优先级
+
+  tags:
+    type: array
+    items:
+      type: string
+    description: 实验标签（用于归类和筛选）
+    example: ["baseline", "anchor_tuning"]

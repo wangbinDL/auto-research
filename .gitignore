@@ -1,0 +1,70 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+dist/
+build/
+.eggs/
+*.egg
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Training artifacts (large files)
+*.pt
+*.pth
+*.bin
+*.safetensors
+*.ckpt
+checkpoints/
+outputs/
+runs/
+wandb/
+
+# Data (too large for git)
+data/
+datasets/
+*.tar.gz
+*.zip
+
+# Logs
+logs/
+*.log
+
+# Docker
+*.tar
+
+# Secrets
+.env
+.env.*
+secrets/
+
+# MinIO/Postgres local data
+minio_data/
+pg_data/
+
+# Model outputs
+model_outputs/
+predictions/
+
+# Benchmark reports (generated)
+benchmark/reports/*.html
+benchmark/reports/*.json

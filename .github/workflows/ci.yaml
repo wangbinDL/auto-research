@@ -1,0 +1,62 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install linters
+        run: pip install ruff mypy
+      - name: Ruff check
+        run: ruff check .
+      - name: Ruff format check
+        run: ruff format --check .
+
+  schema-validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install dependencies
+        run: pip install jsonschema pyyaml
+      - name: Validate schemas
+        run: python scripts/validate_schemas.py
+
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        module: [agent, cv_platform, data_training, benchmark]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install test dependencies
+        run: pip install pytest pytest-cov
+      - name: Run tests
+        run: pytest ${{ matrix.module }}/tests/ -v --tb=short
+
+  integration:
+    runs-on: ubuntu-latest
+    needs: [lint, schema-validate, test]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install dependencies
+        run: pip install pytest pyyaml jsonschema
+      - name: Run integration tests
+        run: pytest tests/integration/ -v --tb=short

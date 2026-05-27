@@ -1,0 +1,27 @@
+{
+  "experiment_id": "exp_mock_001",
+  "status": "success",
+  "started_at": "2026-06-02T10:00:00Z",
+  "finished_at": "2026-06-02T10:25:30Z",
+  "duration_seconds": 1530,
+  "metrics": {
+    "mAP": 0.421,
+    "mAP_50": 0.587,
+    "loss_final": 0.832,
+    "epochs_completed": 5
+  },
+  "artifacts": {
+    "best_checkpoint": "/runs/exp_mock_001/weights/best.pt",
+    "last_checkpoint": "/runs/exp_mock_001/weights/last.pt",
+    "log_file": "/runs/exp_mock_001/train.log",
+    "wandb_run_url": "https://wandb.ai/auto-research/cv-agent/runs/mock001",
+    "predictions_dir": "/runs/exp_mock_001/predictions/"
+  },
+  "system_info": {
+    "gpu_model": "NVIDIA A100 80GB",
+    "gpu_count": 1,
+    "gpu_memory_gb": 80,
+    "peak_gpu_memory_gb": 23.4,
+    "node_hostname": "gpu-node-01"
+  }
+}

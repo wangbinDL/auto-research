@@ -1,0 +1,122 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "experiment_result.schema.json",
+  "$comment": "接口 1b: experiment_result.json | 方向: CV平台 (吴凡) → Agent (何天尧) | 用途: CV 平台返回实验结果 | 版本: v0.1 (W3 冻结)",
+  "type": "object",
+  "required": ["experiment_id", "status", "started_at", "finished_at", "metrics", "artifacts"],
+  "properties": {
+    "experiment_id": {
+      "type": "string",
+      "description": "对应 experiment_spec 中的唯一标识符",
+      "examples": ["exp_000123"]
+    },
+    "status": {
+      "type": "string",
+      "enum": ["success", "failed", "timeout", "oom"],
+      "description": "实验最终状态"
+    },
+    "started_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "实验开始时间 (ISO 8601)"
+    },
+    "finished_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "实验结束时间 (ISO 8601)"
+    },
+    "duration_seconds": {
+      "type": "number",
+      "description": "实际运行时长（秒）"
+    },
+    "metrics": {
+      "type": "object",
+      "description": "评测指标（根据 task_type 不同）",
+      "properties": {
+        "mAP": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "目标检测 mAP@0.5:0.95"
+        },
+        "mAP_50": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "目标检测 mAP@0.5"
+        },
+        "mIoU": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "语义分割 mean IoU"
+        },
+        "loss_final": {
+          "type": "number",
+          "description": "最终 training loss"
+        },
+        "epochs_completed": {
+          "type": "integer",
+          "description": "实际完成的 epoch 数"
+        }
+      }
+    },
+    "artifacts": {
+      "type": "object",
+      "description": "产出文件路径",
+      "properties": {
+        "best_checkpoint": {
+          "type": "string",
+          "description": "最佳权重文件路径"
+        },
+        "last_checkpoint": {
+          "type": "string",
+          "description": "最后一个 checkpoint 路径"
+        },
+        "log_file": {
+          "type": "string",
+          "description": "训练日志文件路径"
+        },
+        "wandb_run_url": {
+          "type": "string",
+          "format": "uri",
+          "description": "W&B 实验页面链接"
+        },
+        "predictions_dir": {
+          "type": "string",
+          "description": "预测结果目录"
+        }
+      }
+    },
+    "error": {
+      "type": "object",
+      "description": "失败时的错误信息",
+      "properties": {
+        "code": {
+          "type": "string",
+          "enum": ["OOM", "CUDA_ERROR", "DATA_ERROR", "CONFIG_ERROR", "TIMEOUT", "UNKNOWN"],
+          "description": "错误类型码"
+        },
+        "message": {
+          "type": "string",
+          "description": "错误详情"
+        },
+        "traceback": {
+          "type": "string",
+          "description": "Python traceback（截断至最后 2000 字符）"
+        }
+      }
+    },
+    "system_info": {
+      "type": "object",
+      "description": "运行环境信息",
+      "properties": {
+        "gpu_model": { "type": "string" },
+        "gpu_count": { "type": "integer" },
+        "gpu_memory_gb": { "type": "number" },
+        "peak_gpu_memory_gb": { "type": "number" },
+        "node_hostname": { "type": "string" }
+      }
+    }
+  }
+}

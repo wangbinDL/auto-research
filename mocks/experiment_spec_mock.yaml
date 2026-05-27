@@ -1,0 +1,17 @@
+# Mock experiment_spec — 用于解耦开发
+# Agent 团队 (何天尧) 在 CV 平台就绪前使用此 mock 测试
+experiment_id: "exp_mock_001"
+task_type: detection
+framework: ultralytics
+dataset: coco
+config_path: "detection/yolo26_coco.yaml"
+config_overrides:
+  model.backbone: "yolo26-n"
+  train.epochs: 5
+  train.batch_size: 16
+work_dir: "/runs/exp_mock_001"
+gpu: 1
+max_hours: 0.5
+seed: 42
+priority: normal
+tags: ["mock", "smoke_test"]

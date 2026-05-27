@@ -1,0 +1,114 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "trajectory.schema.json",
+  "$comment": "接口 2: trajectory.jsonl | 方向: Agent (何天尧) → 质检训练 (栗维鸿) | 用途: Agent 决策轨迹数据流转 | 版本: v0.1 (W3 冻结) | 格式: 每行一个 JSON 对象 (JSONL)",
+  "type": "object",
+  "required": ["trajectory_id", "experiment_id", "timestamp", "step_index", "phase", "content"],
+  "properties": {
+    "trajectory_id": {
+      "type": "string",
+      "description": "轨迹唯一 ID（一个完整科研循环 = 一条轨迹）",
+      "examples": ["traj_20260601_001"]
+    },
+    "experiment_id": {
+      "type": "string",
+      "description": "关联的实验 ID"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "该步骤产生时间 (ISO 8601)"
+    },
+    "step_index": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "步骤序号（从 0 开始）"
+    },
+    "phase": {
+      "type": "string",
+      "enum": ["observe", "hypothesize", "plan", "execute", "analyze", "reflect"],
+      "description": "当前决策阶段"
+    },
+    "content": {
+      "type": "object",
+      "description": "步骤具体内容（根据 phase 不同结构不同）",
+      "properties": {
+        "thought": {
+          "type": "string",
+          "description": "Agent 的思考过程（CoT）"
+        },
+        "action": {
+          "type": "object",
+          "description": "Agent 执行的动作",
+          "properties": {
+            "tool": {
+              "type": "string",
+              "enum": ["modify_config", "run_experiment", "read_results", "search_literature", "write_code", "analyze_metrics"],
+              "description": "使用的工具"
+            },
+            "args": {
+              "type": "object",
+              "description": "工具参数"
+            }
+          }
+        },
+        "observation": {
+          "type": "string",
+          "description": "环境返回的观察结果"
+        },
+        "reflection": {
+          "type": "string",
+          "description": "Agent 对结果的反思和总结"
+        }
+      }
+    },
+    "metadata": {
+      "type": "object",
+      "description": "元信息",
+      "properties": {
+        "model": {
+          "type": "string",
+          "description": "产生该步骤的 LLM 模型 ID",
+          "examples": ["qwen3-72b"]
+        },
+        "tokens_in": {
+          "type": "integer",
+          "description": "输入 token 数"
+        },
+        "tokens_out": {
+          "type": "integer",
+          "description": "输出 token 数"
+        },
+        "latency_ms": {
+          "type": "integer",
+          "description": "推理延迟（毫秒）"
+        },
+        "temperature": {
+          "type": "number",
+          "description": "采样温度"
+        }
+      }
+    },
+    "quality": {
+      "type": "object",
+      "description": "质检标注（由栗维鸿的质检模块填充）",
+      "properties": {
+        "is_valid": {
+          "type": "boolean",
+          "description": "是否通过质检"
+        },
+        "score": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "质量分数"
+        },
+        "flags": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "质检标记（如 repetitive, hallucination, off_topic）"
+        }
+      }
+    }
+  }
+}

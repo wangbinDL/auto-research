@@ -1,0 +1,109 @@
+# 接口 3: model_manifest.yaml
+# 方向: 训练 (栗维鸿) → Benchmark (负责人)
+# 用途: 训练完成的模型元信息，用于评测调度
+# 版本: v0.1 (W3 冻结)
+
+type: object
+required:
+  - model_id
+  - base_model
+  - training_method
+  - data_version
+  - checkpoint_path
+  - created_at
+
+properties:
+  model_id:
+    type: string
+    description: 模型唯一标识符
+    example: "qwen3-72b-sft-v001"
+
+  base_model:
+    type: string
+    description: 基座模型
+    example: "Qwen/Qwen3-72B"
+
+  training_method:
+    type: string
+    enum: [sft, dpo, grpo, kto]
+    description: 训练方法
+
+  data_version:
+    type: string
+    description: 使用的训练数据版本
+    example: "traj_v0.3_filtered"
+
+  data_stats:
+    type: object
+    description: 训练数据统计
+    properties:
+      total_samples:
+        type: integer
+        description: 总样本数
+      avg_turns:
+        type: number
+        description: 平均对话轮数
+      avg_tokens:
+        type: number
+        description: 平均 token 数
+      source_distribution:
+        type: object
+        description: 数据来源分布（detection/segmentation）
+
+  checkpoint_path:
+    type: string
+    description: 模型权重路径（MinIO 或本地）
+    example: "s3://models/qwen3-72b-sft-v001/checkpoint-final"
+
+  created_at:
+    type: string
+    format: date-time
+    description: 训练完成时间
+
+  training_config:
+    type: object
+    description: 训练超参数摘要
+    properties:
+      framework:
+        type: string
+        enum: [ms-swift, deepspeed]
+        description: 训练框架
+      epochs:
+        type: integer
+      learning_rate:
+        type: number
+      batch_size:
+        type: integer
+      gpu_count:
+        type: integer
+      training_hours:
+        type: number
+        description: 训练总耗时（小时）
+
+  eval_request:
+    type: object
+    description: 评测请求参数
+    properties:
+      tasks:
+        type: array
+        items:
+          type: string
+          enum: [cv_research_planning, experiment_design, result_analysis, code_generation, full_loop]
+        description: 需要评测的任务集
+      priority:
+        type: string
+        enum: [low, normal, high]
+        default: normal
+      compare_with:
+        type: array
+        items:
+          type: string
+        description: 需要对比的 baseline 模型 ID
+        example: ["qwen3-72b-base", "qwen3-72b-sft-v000"]
+
+  tags:
+    type: array
+    items:
+      type: string
+    description: 模型标签
+    example: ["ablation_lr", "full_data"]

@@ -1,0 +1,22 @@
+[project]
+name = "auto-research"
+version = "0.1.0"
+description = "AI 科研闭环系统 — 让 AI 自动做 CV 科研，录制决策轨迹，训练下一代 Qwen 模型"
+requires-python = ">=3.11"
+license = "LicenseRef-Proprietary"
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "W"]
+ignore = ["E501"]
+
+[tool.ruff.format]
+quote-style = "double"
+
+[tool.pytest.ini_options]
+testpaths = ["agent/tests", "cv_platform/tests", "data_training/tests", "benchmark/tests", "tests/integration"]
+python_files = "test_*.py"
+python_functions = "test_*"

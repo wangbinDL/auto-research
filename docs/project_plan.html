@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auto Research 项目启动文档 v3.0 — 基模数据团队</title>
+    <style>
+        :root { --primary: #1a73e8; --accent: #e94560; --dark: #16213e; --gray: #5f6368; --light: #f8f9fa; --border: #dadce0; --success: #28a745; --warning: #ffc107; --danger: #dc3545; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.8; color: var(--dark); background: var(--light); padding: 20px; }
+        .container { max-width: 1020px; margin: 0 auto; background: white; border-radius: 12px; box-shadow: 0 4px 24px rgba(0,0,0,0.06); padding: 50px; }
+        h1 { font-size: 2.2em; color: var(--dark); margin-bottom: 8px; border-bottom: 3px solid var(--accent); padding-bottom: 12px; }
+        h2 { font-size: 1.5em; color: #0f3460; margin-top: 48px; margin-bottom: 16px; padding-left: 12px; border-left: 4px solid var(--accent); }
+        h3 { font-size: 1.2em; color: var(--dark); margin-top: 28px; margin-bottom: 10px; }
+        h4 { font-size: 1.05em; color: var(--gray); margin-top: 20px; margin-bottom: 8px; }
+        p { margin-bottom: 14px; text-align: justify; color: #333; }
+        ul, ol { margin-left: 20px; margin-bottom: 15px; }
+        li { margin-bottom: 6px; }
+        .subtitle { color: var(--gray); font-size: 1em; margin-bottom: 30px; }
+        .north-star { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 24px 30px; border-radius: 12px; margin: 25px 0; font-size: 1.1em; line-height: 1.7; }
+        .north-star strong { color: #ffd700; }
+        .highlight-box { background: #fff3cd; border-left: 4px solid var(--warning); padding: 16px 20px; margin: 20px 0; border-radius: 0 8px 8px 0; }
+        .key-insight { background: #d4edda; border-left: 4px solid var(--success); padding: 16px 20px; margin: 20px 0; border-radius: 0 8px 8px 0; }
+        .warning-box { background: #f8d7da; border-left: 4px solid var(--danger); padding: 16px 20px; margin: 20px 0; border-radius: 0 8px 8px 0; }
+        .info-box { background: #e8f0fe; border-left: 4px solid var(--primary); padding: 16px 20px; margin: 20px 0; border-radius: 0 8px 8px 0; }
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 0.9em; }
+        th, td { padding: 10px 12px; border: 1px solid var(--border); text-align: left; vertical-align: top; }
+        th { background: #0f3460; color: white; font-weight: 500; }
+        tr:nth-child(even) { background: var(--light); }
+        .tag { display: inline-block; padding: 2px 10px; border-radius: 12px; font-size: 0.8em; font-weight: 600; margin-right: 6px; }
+        .tag-mvp { background: #d4edda; color: #155724; }
+        .tag-full { background: #cce5ff; color: #004085; }
+        .tag-critical { background: #f8d7da; color: #721c24; }
+        .flow-diagram { background: #f8f9fa; border: 2px solid var(--border); border-radius: 12px; padding: 24px; margin: 20px 0; font-family: 'SF Mono', 'Fira Code', monospace; font-size: 0.85em; line-height: 2; text-align: center; }
+        .flow-diagram .arrow { color: var(--accent); font-weight: bold; }
+        .person-card { background: white; border: 2px solid var(--border); border-radius: 10px; padding: 18px 22px; margin: 12px 0; transition: border-color 0.2s; }
+        .person-card:hover { border-color: var(--primary); }
+        .person-card .name { font-size: 1.1em; font-weight: 700; color: var(--primary); }
+        .person-card .role { font-size: 0.9em; color: var(--gray); margin-bottom: 8px; }
+        .person-card .boundary { font-size: 0.85em; color: #999; border-top: 1px solid #eee; padding-top: 8px; margin-top: 8px; }
+        .sprint-card { background: white; border: 1px solid var(--border); border-radius: 10px; padding: 20px; margin: 16px 0; border-left: 5px solid var(--primary); }
+        .sprint-card .sprint-title { font-weight: 700; font-size: 1.05em; color: var(--primary); margin-bottom: 8px; }
+        .sprint-card .sprint-date { font-size: 0.85em; color: var(--gray); }
+        .sprint-card .deliverable { background: #e8f5e9; padding: 3px 10px; border-radius: 4px; font-size: 0.85em; display: inline-block; margin: 3px 4px 3px 0; }
+        .sprint-card .checkpoint { background: #fff3e0; padding: 3px 10px; border-radius: 4px; font-size: 0.85em; display: inline-block; margin: 3px 4px 3px 0; }
+        .milestone-card { background: white; border: 2px solid var(--accent); border-radius: 10px; padding: 16px 20px; margin: 16px 0; }
+        .milestone-card .ms-title { font-weight: 700; color: var(--accent); font-size: 1.05em; }
+        .milestone-card .ms-date { font-size: 0.85em; color: var(--gray); }
+        .week-grid { display: grid; grid-template-columns: 1fr; gap: 8px; margin: 12px 0; }
+        .week-person { display: grid; grid-template-columns: 80px 1fr 1fr; gap: 8px; padding: 8px 12px; border-radius: 6px; font-size: 0.88em; }
+        .week-person.wufan { background: #e3f2fd; }
+        .week-person.tianyao { background: #fce4ec; }
+        .week-person.weihong { background: #e8f5e9; }
+        .week-person.leader { background: #ede7f6; }
+        .week-person .wp-name { font-weight: 700; }
+        .week-person .wp-task { }
+        .week-person .wp-output { color: var(--gray); font-style: italic; }
+        .comparison { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 20px 0; }
+        .comparison .bad { background: #fff5f5; border: 1px solid #fed7d7; border-radius: 8px; padding: 16px; }
+        .comparison .good { background: #f0fff4; border: 1px solid #c6f6d5; border-radius: 8px; padding: 16px; }
+        .comparison .label { font-weight: 700; font-size: 0.9em; margin-bottom: 8px; }
+        .glossary { background: #f8f9fa; border-radius: 8px; padding: 20px 24px; margin: 20px 0; }
+        .glossary dt { font-weight: 700; color: var(--primary); margin-top: 10px; }
+        .glossary dd { margin-left: 16px; margin-bottom: 6px; color: #555; }
+        .toc { background: #f0f4ff; border-radius: 8px; padding: 20px 28px; margin: 25px 0; }
+        .toc h3 { margin-top: 0; color: #0f3460; }
+        .toc ul { list-style: none; padding-left: 0; }
+        .toc li { margin: 8px 0; }
+        .toc a { color: var(--accent); text-decoration: none; font-weight: 500; }
+        .toc a:hover { text-decoration: underline; }
+        .resource-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 16px 0; }
+        .resource-item { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 8px; padding: 12px; text-align: center; font-size: 0.88em; }
+        .resource-item .num { font-size: 1.8em; font-weight: 700; color: var(--primary); }
+        .module-card { background: white; border: 2px solid #e3e8ee; border-radius: 10px; padding: 18px; margin: 14px 0; }
+        .module-card .module-name { font-weight: 700; color: #0f3460; font-size: 1.05em; margin-bottom: 6px; }
+        .module-card .module-owner { display: inline-block; background: var(--primary); color: white; padding: 2px 10px; border-radius: 10px; font-size: 0.8em; }
+        .module-card code { background: #f1f3f5; padding: 2px 6px; border-radius: 4px; font-size: 0.85em; }
+        .arch-img { text-align: center; margin: 24px 0; }
+        .arch-img img { max-width: 100%; border-radius: 10px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); }
+        .repo-tree { background: #1e1e2e; color: #cdd6f4; padding: 20px; border-radius: 8px; font-family: 'SF Mono', 'Fira Code', monospace; font-size: 0.82em; line-height: 1.8; margin: 16px 0; overflow-x: auto; white-space: pre; }
+        .mock-strategy { background: #fef3c7; border: 1px solid #f59e0b; border-radius: 8px; padding: 16px; margin: 16px 0; }
+        .mock-strategy .ms-title { font-weight: 700; color: #92400e; margin-bottom: 8px; }
+        @media (max-width: 768px) { .container { padding: 20px; } h1 { font-size: 1.5em; } .comparison { grid-template-columns: 1fr; } .resource-grid { grid-template-columns: 1fr; } .week-person { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+<div class="container">
+
+<h1>Auto Research 项目启动文档</h1>
+<p class="subtitle">基模数据团队 | 2026 年 5 月 | v3.0（并行执行 + 逐周路线图 + Mock 解耦版）</p>
+
+<div class="toc">
+    <h3>目录</h3>
+    <ul>
+        <li><a href="#background">1. 项目背景与动机</a></li>
+        <li><a href="#story">2. 一个故事讲清楚整件事</a> ⭐ 先看这里</li>
+        <li><a href="#approach">3. 整体思路与技术路线</a></li>
+        <li><a href="#roadmap">4. 12 周执行路线图（逐周推进）</a> ⭐ 核心章节</li>
+        <li><a href="#modules">5. 系统模块拆分（7 大模块）</a></li>
+        <li><a href="#assignments">6. 分工安排与协作机制</a></li>
+        <li><a href="#quality">7. 质量标准与验收机制</a></li>
+        <li><a href="#risks">8. 风险与应急方案</a></li>
+        <li><a href="#glossary">9. 术语表</a></li>
+    </ul>
+</div>
+
+<!-- ==================== Section 1 ==================== -->
+<h2 id="background">1. 项目背景与动机</h2>
+
+<h3>1.1 一句话说清楚我们要做什么</h3>
+
+<div class="north-star">
+    我们要造一个能<strong>自动做科研</strong>的 AI 系统（目标检测/语义分割领域），然后把它"解题的完整思路"录制下来，作为训练下一代大模型的<strong>教科书数据</strong>。最终用这些数据训练一个 Qwen 模型，使其在 CV 科研任务上<strong>接近 Codex / Claude Code 的科研能力水平</strong>。
+</div>
+
+<h3>1.2 为什么做这件事？</h3>
+<p>2026 年，大模型最稀缺的不再是普通问答数据，而是<strong>长程决策轨迹数据</strong>——即 AI 面对一个复杂问题时，从头到尾"怎么想、怎么试、失败了怎么改、最后怎么成功"的完整过程记录。</p>
+
+<div class="highlight-box">
+    <p><strong>对标参考——Codex / Claude Code：</strong></p>
+    <p>Claude Code 在 SWE-bench 上从 22%（2024.03）飙升到 72.5%（2025.05），18 个月翻了 3 倍。Codex 在同期达到类似突破。能力爆发的核心原因不是工具多，而是<strong>训练数据的进化</strong>——从普通代码数据升级为"完整的编程决策轨迹"。</p>
+    <p><strong>我们的目标：</strong>在 CV 科研领域复现这个范式——用"科研决策轨迹"训练模型，让它在目标检测/语义分割任务上达到接近 Codex/Claude Code 级别的自主研究能力。</p>
+</div>
+
+<h3>1.3 我们有什么资源？</h3>
+<div class="resource-grid">
+    <div class="resource-item"><div class="num">64</div>GPU（H 集群）</div>
+    <div class="resource-item"><div class="num">4</div>全职人员</div>
+    <div class="resource-item"><div class="num">12</div>周时间</div>
+</div>
+
+<!-- ==================== Section 2 ==================== -->
+<h2 id="story">2. 一个故事讲清楚整件事</h2>
+
+<div class="info-box" style="font-size: 1.02em; line-height: 2;">
+<p style="margin-bottom:16px;">想象你是一位 CV 研究员，面前有一个目标检测任务需要提升 mAP。你会怎么做？</p>
+
+<p><strong>第一步：观察现状。</strong>你跑了一个 baseline 模型，看到 mAP 只有 38.2%。你分析了 bad case——小目标漏检严重。</p>
+
+<p><strong>第二步：提出假设。</strong>"如果我把 anchor 尺寸改小、同时加一层 FPN，小目标应该能好。"</p>
+
+<p><strong>第三步：写代码改配置。</strong>你修改了 config 文件，调了 anchor size，加了 FPN level。</p>
+
+<p><strong>第四步：跑实验。</strong>提交训练任务，等 2 小时，mAP 涨到 40.1%。</p>
+
+<p><strong>第五步：分析结果。</strong>小目标好了，但大目标退化了。你决定加一个 multi-scale 训练策略。</p>
+
+<p><strong>第六步：继续迭代……</strong></p>
+</div>
+
+<p>上面这个过程——<strong>观察→假设→修改→实验→分析→再迭代</strong>——就是一条完整的"科研决策轨迹"。</p>
+
+<div class="north-star">
+    <strong>我们要做的事情，就三步：</strong><br><br>
+    <strong>① 造一个能自动做上述事情的 AI Agent</strong>（代替你坐在电脑前反复操作）<br>
+    <strong>② 把 Agent "解题的全过程"录制下来</strong>（每一步想了什么、改了什么、结果如何）<br>
+    <strong>③ 用这些"解题过程"训练一个新模型</strong>（让 Qwen 学会像你一样做科研）
+</div>
+
+<h3>2.1 为什么这件事值得做？</h3>
+<p>2026 年，大模型最缺的不是问答数据，而是<strong>"解决复杂问题的完整过程记录"</strong>。Codex 和 Claude Code 之所以能自动写代码、修 bug，不是因为它们看了更多代码，而是因为它们训练在了<strong>"程序员解决问题的完整轨迹"</strong>上——从发现 bug 到定位到修复的全过程。</p>
+<p>我们要在 CV 科研领域做同样的事。而且我们有独特优势：CV 实验结果可以<strong>自动验证</strong>（mAP 涨了就是涨了），不需要人工标注。</p>
+
+<h3>2.2 四个人各扮演什么角色？</h3>
+
+<div class="comparison" style="grid-template-columns: 1fr 1fr;">
+    <div class="good">
+        <div class="label">🔧 吴凡 — 实验室管理员</div>
+        <p style="font-size:0.9em;">负责"实验室"的硬件环境：GPU 集群能跑、Docker 镜像能用、给任何 config 都能稳定返回实验结果。相当于保证实验室的仪器设备都是好的。</p>
+    </div>
+    <div class="good">
+        <div class="label">🧠 何天尧 — AI 研究员的大脑</div>
+        <p style="font-size:0.9em;">负责造出那个"会自动做科研"的 Agent：它能思考、能写代码、能提交实验、能分析结果、能决定下一步做什么。同时负责把它的全过程忠实记录下来。</p>
+    </div>
+</div>
+<div class="comparison" style="grid-template-columns: 1fr 1fr;">
+    <div class="good">
+        <div class="label">⚗️ 栗维鸿 — 数据炼金师</div>
+        <p style="font-size:0.9em;">负责把 Agent 产出的"原始实验记录"提纯成"高质量教材"：过滤垃圾、修正 reward、转成训练格式、用这些数据训练 Qwen。相当于把原始矿石炼成黄金。</p>
+    </div>
+    <div class="good">
+        <div class="label">📋 负责人 — 考官</div>
+        <p style="font-size:0.9em;">负责定义"什么叫做好"：出考试题（Benchmark）、判分（评测）、决定方向（这条路走不通就换）。从第一天就定义评测标准，不是最后才验收。</p>
+    </div>
+</div>
+
+<h3>2.3 项目全流程一句话版</h3>
+<div class="flow-diagram">
+    吴凡搭好实验室 <span class="arrow">→</span> 何天尧造出 AI 研究员 <span class="arrow">→</span> AI 研究员自动做实验 <span class="arrow">→</span> 录制解题过程 <span class="arrow">→</span> 栗维鸿提纯成教材 <span class="arrow">→</span> 用教材训练 Qwen <span class="arrow">→</span> 负责人考试验收<br><br>
+    <span style="font-size:0.85em; color:#666;">整个过程形成飞轮：考试发现弱点 → Agent 针对性补强 → 新一轮教材 → Qwen 更强</span>
+</div>
+
+<h3>2.4 12 周怎么推进？（极简版）</h3>
+<table>
+    <tr><th>阶段</th><th>一句话目标</th><th>类比</th></tr>
+    <tr><td><strong>W1-W2</strong></td><td>实验室开张 + 所有人各自准备</td><td>租好场地、买好设备、每人搭好自己的工位</td></tr>
+    <tr><td><strong>W3-W4</strong></td><td>AI 研究员第一次独立完成实验</td><td>新员工完成第一个任务（哪怕很粗糙）</td></tr>
+    <tr><td><strong>W5-W6</strong></td><td>AI 研究员稳定工作，开始批量产出</td><td>新员工能独立干活了，开始出成果</td></tr>
+    <tr><td><strong>W7-W8</strong></td><td>攒够足够的"教材"，准备开课</td><td>教材编好了，等着开训练班</td></tr>
+    <tr><td><strong>W9-W10</strong></td><td>Qwen 第一次"上课"+ 第一次考试</td><td>学生学完第一轮，考试看效果</td></tr>
+    <tr><td><strong>W11-W12</strong></td><td>查漏补缺 + 最终大考</td><td>针对弱项加强训练，期末考试</td></tr>
+</table>
+
+<!-- ==================== Section 3 (原 Section 2) ==================== -->
+<h2 id="approach">3. 整体思路与技术路线</h2>
+
+<h3>3.1 系统架构全景图</h3>
+
+<div class="arch-img">
+    <img src="Paper/Long_Context/assets/auto_research_architecture.png" alt="Auto Research 系统架构图">
+    <p style="font-size:0.85em; color:#999; margin-top:8px;">图：4 大区域流水线 + 人员 Ownership 映射 + 4 个接口文件 + Error-driven 反馈闭环</p>
+</div>
+
+<h3>3.2 技术选型结论（CCG 三方验证 + 2026.05 框架调研）</h3>
+
+<div class="key-insight">
+    <p><strong>推荐框架组合（2026 年 5 月最新验证）：</strong></p>
+    <ul>
+        <li><strong>LangGraph v0.3</strong> — 主编排框架（有状态 Agent、checkpoint、human-in-the-loop、失败恢复）</li>
+        <li><strong>AIDE 式树搜索</strong> — 实验策略（metric-driven pruning，将 mAP/mIoU 作为搜索信号）</li>
+        <li><strong>MLAgentBench 式评测</strong> — Benchmark 协议（端到端 ML 实验评测）</li>
+        <li><strong>Ultralytics YOLO26</strong> — 目标检测底座（57.6k stars，一站式检测/分割/分类，取代已停更的 MMDetection）</li>
+        <li><strong>HuggingFace Transformers + Mask2Former</strong> — 语义分割底座（统一语义/实例/全景分割，取代已停更的 MMSegmentation）</li>
+        <li><strong>ms-swift v4</strong> — Qwen SFT/DPO 训练（阿里官方维护，Qwen 原生支持最佳，内置 Megatron 并行）</li>
+        <li><strong>Weights & Biases</strong> — 实验追踪与可视化（sweep 超参搜索 + 团队协作）</li>
+        <li><strong>DeepSpeed ZeRO-3 + FSDP2</strong> — 64 卡分布式训练</li>
+    </ul>
+</div>
+
+<div class="highlight-box">
+    <p><strong>⚠️ 技术栈更新说明（2026.05 调研结论）：</strong></p>
+    <ul>
+        <li><strong>MMDetection 已停更</strong>（最后 release v3.3.0 = 2024.01，1.8k open issues 无人处理）→ 替换为 Ultralytics YOLO26</li>
+        <li><strong>MMSegmentation 已停更</strong>（最后 release v1.2.2 = 2023.12）→ 替换为 HF Transformers + Mask2Former/SegFormer</li>
+        <li><strong>LLaMA-Factory 仍可用</strong>（71.6k stars）但 ms-swift v4（阿里官方，2026.5.24 最新版）对 Qwen3 系列支持最佳</li>
+        <li><strong>LangGraph 仍是最佳选择</strong>（33k stars，v0.3.15 = 2026.5.22），ML 科研 Agent 需要其复杂状态管理能力</li>
+    </ul>
+</div>
+
+<h3>3.3 Agent 后端模型策略（三阶段）</h3>
+<table>
+    <tr><th>阶段</th><th>策略</th><th>模型</th><th>目的</th></tr>
+    <tr><td>Phase 1：Teacher</td><td>强模型生成高质量轨迹</td><td>Qwen3.7-Max / Claude API / GPT-5.5</td><td>保证轨迹质量天花板</td></tr>
+    <tr><td>Phase 2：Student</td><td>本地模型 SFT 学习 Teacher 轨迹</td><td>Qwen3-32B / 72B（LoRA）</td><td>验证数据→能力转化</td></tr>
+    <tr><td>Phase 3：路由</td><td>按任务难度分流</td><td>规划用强模型 + 编码用 coding 模型 + 日志用小模型</td><td>降低 API 成本</td></tr>
+</table>
+
+<h3>3.4 四个跨人接口（系统全部耦合点）</h3>
+
+<div class="info-box">
+    <p><strong>设计原则：</strong>整个系统只有 4 个接口文件。每人内部可以自由迭代，只要接口兼容，互不阻塞。</p>
+</div>
+
+<div class="flow-diagram">
+    <strong>数据流与人员边界</strong><br><br>
+    何天尧 <span class="arrow">──experiment_spec.yaml──▶</span> 吴凡(CV平台)<br>
+    吴凡 <span class="arrow">──experiment_result.json──▶</span> 何天尧(Agent)<br>
+    何天尧 <span class="arrow">──trajectory.jsonl──▶</span> 栗维鸿(质检+训练)<br>
+    栗维鸿 <span class="arrow">──model_manifest.yaml──▶</span> 负责人(Benchmark)
+</div>
+
+<!-- ==================== Section 3: 核心章节 ==================== -->
+<h2 id="roadmap">4. 12 周执行路线图（逐周推进）</h2>
+
+<p>起始日期：<strong>2026 年 5 月 26 日</strong>，总周期 <strong>12 周</strong>（+ 第 13 周收尾）。</p>
+
+<div class="key-insight">
+    <strong>并行策略：</strong>4 人从第 1 天起全部有实质工作。通过 <strong>Mock/Stub 策略</strong>解耦依赖——接口没 ready 时，各方用 mock 数据继续独立开发。定期集成对齐，而非串行等待。
+</div>
+
+<h3>4.1 Mock/Stub 解耦策略</h3>
+
+<div class="mock-strategy">
+    <div class="ms-title">为什么需要 Mock？</div>
+    <p style="margin-bottom:8px;">传统方式：吴凡搭完环境 → 何天尧才能开发 Agent → 栗维鸿才能做质检。这会导致前 4 周只有一个人在真正推进。</p>
+    <p><strong>我们的方式：</strong>W1 就产出 Mock 数据，让下游提前开发。真实对接时只需替换数据源。</p>
+</div>
+
+<table>
+    <tr><th>接口</th><th>Mock 方</th><th>Mock 内容</th><th>何时替换真实</th></tr>
+    <tr><td>1a: experiment_spec.yaml</td><td>何天尧</td><td>3 个固定 spec（det/seg/tiny），hardcode 实验配置</td><td>W4 吴凡服务 ready</td></tr>
+    <tr><td>1b: experiment_result.json</td><td>何天尧</td><td>预录制 3 种 result（成功/失败/超时）</td><td>W4 真实对接</td></tr>
+    <tr><td>2: trajectory.jsonl</td><td>栗维鸿</td><td>何天尧 W2 产出 Schema 后，脚本生成 50 条合成轨迹</td><td>W6 真实轨迹流入</td></tr>
+    <tr><td>3: model_manifest.yaml</td><td>负责人</td><td>栗维鸿给出 manifest 模板 + dummy checkpoint</td><td>W9 真实模型产出</td></tr>
+</table>
+
+<h3>4.2 六大里程碑（硬性检查点）</h3>
+
+<table>
+    <tr><th>编号</th><th>时间</th><th>硬性验收标准</th><th>不通过怎么办</th></tr>
+    <tr><td><strong>M1</strong></td><td>W2 末<br>6/6</td><td>环境就绪 + 2 个 CV baseline 跑通 + Schema v0.1 + mock 轨迹可用</td><td>全员帮 debug 环境（不超过 2 天）</td></tr>
+    <tr><td><strong>M2</strong></td><td>W4 末<br>6/20</td><td><strong>接口 v0.1 冻结 + 单任务端到端闭环跑通</strong>（哪怕粗糙）</td><td>何天尧+吴凡集中 3 天联调，其他人继续</td></tr>
+    <tr><td><strong>M3</strong></td><td>W6 末<br>7/4</td><td>真实轨迹流通 + 首批 50 条质检完成 + 平台无状态服务稳定</td><td>降低质量门槛 + 何天尧调 Agent 策略</td></tr>
+    <tr><td><strong>M4</strong></td><td>W8 末<br>7/18</td><td><strong>Benchmark 冻结 + 训练集 v1 ≥ 200 条 + 64 卡训练环境就绪</strong></td><td>降过滤阈值 or 增加 seed 轨迹</td></tr>
+    <tr><td><strong>M5</strong></td><td>W10 末<br>8/1</td><td><strong>Qwen v1 训练完成 + 首轮 Benchmark 评测出报告</strong></td><td>回退到 7B 小模型快速验证</td></tr>
+    <tr><td><strong>M6</strong></td><td>W12 末<br>8/15</td><td><strong>最终评测：Qwen v2 显著超过 base model，CV 科研能力接近 Codex 水平</strong></td><td>输出差距分析 + 下阶段计划</td></tr>
+</table>
+
+<h3>4.3 逐周计划</h3>
+
+<!-- ===== Sprint 1: W1-W2 ===== -->
+<div class="sprint-card">
+    <div class="sprint-title">Sprint 1：基础搭建 + 全员并行启动</div>
+    <div class="sprint-date">5/26 — 6/6（第 1-2 周）| 里程碑 M1</div>
+
+    <h4>Week 1（5/26-5/30）</h4>
+    <table>
+        <tr><th width="12%">人员</th><th width="55%">每日任务（5 天）</th><th>交付物</th></tr>
+        <tr class="wufan"><td><strong>吴凡</strong></td><td>D1-2: 集群资源审计（GPU 型号/驱动/CUDA/网络/存储）<br>D3-4: cv-agent-base Docker 镜像（PyTorch+Ultralytics+HF Transformers+CUDA）<br>D5: 数据集下载脚本（COCO/ADE20K/Cityscapes）</td><td>集群审计报告<br>Dockerfile v1<br>数据就绪验证</td></tr>
+        <tr class="tianyao"><td><strong>何天尧</strong></td><td>D1-2: AIDE/LangGraph/AI Scientist 源码阅读 + 技术选型报告<br>D3-4: 轨迹 Schema v0.1 设计（JSON 结构+字段说明）<br>D5: experiment_spec.yaml 和 experiment_result.json 格式定义</td><td>技术选型文档<br>Schema v0.1<br>接口格式草案</td></tr>
+        <tr class="weihong"><td><strong>栗维鸿</strong></td><td>D1-2: ms-swift v4 环境搭建 + 单卡 SFT 跑通 demo<br>D3-4: SFT/DPO/LoRA 训练策略对比调研（5 篇核心 paper）<br>D5: 训练策略选型报告</td><td>ms-swift 环境验证<br>调研报告</td></tr>
+        <tr class="leader"><td><strong>负责人</strong></td><td>D1-2: 定义"有效轨迹"量化标准（步数/成功率/metric 提升/资源消耗）<br>D3-4: Benchmark 评测维度 v0（任务成功率/mAP 提升/诊断准确率/资源效率）<br>D5: 各接口验收用例草案</td><td>评测维度 v0<br>有效轨迹定义<br>接口验收用例</td></tr>
+    </table>
+
+    <h4>Week 2（6/2-6/6）</h4>
+    <table>
+        <tr><th width="12%">人员</th><th width="55%">每日任务（5 天）</th><th>交付物</th></tr>
+        <tr><td><strong>吴凡</strong></td><td>D1-2: Ultralytics YOLO26 COCO baseline 跑通<br>D3-4: HF Transformers Mask2Former ADE20K baseline 跑通<br>D5: 实验输出标准化（metrics.json 格式统一）</td><td>检测 mAP 报告<br>分割 mIoU 报告<br>标准输出格式</td></tr>
+        <tr><td><strong>何天尧</strong></td><td>D1-3: LangGraph 项目骨架搭建（状态机框架+工具接口定义）<br>D4-5: <strong>Mock 生成器</strong>——产出 50 条合成轨迹给栗维鸿、3 个 mock result 给自己</td><td>LangGraph 仓库<br><strong>mock 轨迹 50 条</strong><br>mock results</td></tr>
+        <tr><td><strong>栗维鸿</strong></td><td>D1-2: 数据质检规则调研（去重算法/失败分类 taxonomy）<br>D3-5: 基于 mock 轨迹开发质检规则 v0.1（长度/完整性/重复检测）</td><td>质检规则文档 v0.1<br>质检脚本可跑 mock 数据</td></tr>
+        <tr><td><strong>负责人</strong></td><td>D1-3: 审核何天尧 Schema v0.1 + 接口格式<br>D4-5: Benchmark 任务集 v0（10 个固定 CV 实验任务描述+预期 baseline+评判规则）</td><td>Schema 审核意见<br>Benchmark 任务集 v0</td></tr>
+    </table>
+
+    <h4>M1 验收（W2 末）</h4>
+    <span class="deliverable">镜像可一键启动</span>
+    <span class="deliverable">检测+分割 baseline 跑通</span>
+    <span class="deliverable">Schema v0.1 全员对齐</span>
+    <span class="deliverable">mock 轨迹 50 条可用</span>
+    <span class="checkpoint">栗维鸿质检脚本能处理 mock 数据</span>
+</div>
+
+<!-- ===== Sprint 2: W3-W4 ===== -->
+<div class="sprint-card">
+    <div class="sprint-title">Sprint 2：核心开发 + 接口 v0.1 冻结</div>
+    <div class="sprint-date">6/9 — 6/20（第 3-4 周）| 里程碑 M2</div>
+
+    <h4>Week 3（6/9-6/13）</h4>
+    <table>
+        <tr><th width="12%">人员</th><th width="55%">每日任务（5 天）</th><th>交付物</th></tr>
+        <tr><td><strong>吴凡</strong></td><td>D1-3: 实验执行服务开发（接收 spec.yaml → Slurm 提交 → 状态轮询 → 返回 result.json）<br>D4-5: 服务健康检查 + GPU quota 管理</td><td>实验执行服务 v0.1<br>GPU quota 逻辑</td></tr>
+        <tr><td><strong>何天尧</strong></td><td>D1-3: Agent 核心循环实现（plan→edit_config→submit→parse_result→decide_next）<br>D4-5: 工具接口封装（run_train/run_eval/read_log/edit_code/search）</td><td>Agent 单步循环（对 mock）<br>工具接口 5 个</td></tr>
+        <tr><td><strong>栗维鸿</strong></td><td>D1-3: 轨迹去重模块（edit-distance + embedding 相似度）<br>D4-5: 失败归因分类器 v0.1（规则 based: OOM/timeout/config_error/silent_bug）</td><td>去重模块<br>失败归因脚本</td></tr>
+        <tr><td><strong>负责人</strong></td><td>D1-2: <strong>主持接口 v0.1 冻结会议</strong>（4 人对齐 4 个接口的 field 级定义）<br>D3-5: 评测自动化脚本骨架（给定 agent → 运行任务 → 收集 → 打分）</td><td><strong>接口 v0.1 冻结文档</strong><br>评测脚本骨架</td></tr>
+    </table>
+
+    <h4>Week 4（6/16-6/20）</h4>
+    <table>
+        <tr><th width="12%">人员</th><th width="55%">每日任务（5 天）</th><th>交付物</th></tr>
+        <tr><td><strong>吴凡</strong></td><td>D1-3: 实验服务对接真实 Slurm 调度<br>D4-5: 集成测试（真实提交一次检测训练→返回 result.json）</td><td>实验服务 v0.2（真实 Slurm）<br>端到端集成测试通过</td></tr>
+        <tr><td><strong>何天尧</strong></td><td>D1-3: Agent 对接吴凡真实服务（替换 mock result）<br>D4-5: <strong>单任务端到端跑通</strong>（Agent 提交→获取结果→做下一步决策）</td><td><strong>单任务闭环 Demo</strong></td></tr>
+        <tr><td><strong>栗维鸿</strong></td><td>D1-3: reward 重算模块（从 result 提取 delta_metric + cost → 综合 reward）<br>D4-5: SFT 格式转换器 v0.1（trajectory.jsonl → conversation 格式）</td><td>reward 计算模块<br>SFT 转换器</td></tr>
+        <tr><td><strong>负责人</strong></td><td>D1-2: 审核单任务闭环 demo<br>D3-5: Benchmark 任务集扩展到 20 个 + Codex/Claude Code baseline 对照</td><td>闭环审核报告<br>强模型 baseline 数据</td></tr>
+    </table>
+
+    <h4>M2 验收（W4 末）</h4>
+    <span class="deliverable">接口 v0.1 四方签字冻结</span>
+    <span class="deliverable">单任务端到端闭环跑通（哪怕粗糙）</span>
+    <span class="deliverable">栗维鸿 reward + SFT 转换可运行</span>
+    <span class="checkpoint">Agent 能自主完成 1 次完整实验循环</span>
+</div>
+
+<!-- ===== Sprint 3: W5-W6 ===== -->
+<div class="sprint-card">
+    <div class="sprint-title">Sprint 3：增强稳定 + 真实轨迹流通</div>
+    <div class="sprint-date">6/23 — 7/4（第 5-6 周）| 里程碑 M3</div>
+
+    <h4>Week 5（6/23-6/27）</h4>
+    <table>
+        <tr><th width="12%">人员</th><th width="55%">每日任务（5 天）</th><th>交付物</th></tr>
+        <tr><td><strong>吴凡</strong></td><td>D1-3: 服务稳定性加固（失败重试/OOM 自动降配/超时 kill/日志收集）<br>D4-5: 多实验并行调度（同时跑 4+ 实验不冲突）</td><td>服务 SLA: 99% 正常返回<br>并行调度测试通过</td></tr>
+        <tr><td><strong>何天尧</strong></td><td>D1-3: AIDE 式树搜索策略实现（多候选分支→metric 选择→剪枝）<br>D4-5: 并行实验提交（同时提交 2-4 个候选实验）</td><td>树搜索模块<br>并行实验能力</td></tr>
+        <tr><td><strong>栗维鸿</strong></td><td>D1-3: 质检 pipeline 完整串联（raw→去重→归因→reward→格式化）<br>D4-5: 在 mock + 少量真实轨迹上验证 pipeline</td><td>质检 pipeline 端到端可运行</td></tr>
+        <tr><td><strong>负责人</strong></td><td>D1-3: 有效轨迹门槛细化（最低步数/最低 reward/必须包含的 step 类型）<br>D4-5: 加入质检抽检流程（每周 review 10 条轨迹）</td><td>质量门槛文档 v1<br>首次抽检报告</td></tr>
+    </table>
+
+    <h4>Week 6（6/30-7/4）</h4>
+    <table>
+        <tr><th width="12%">人员</th><th width="55%">每日任务（5 天）</th><th>交付物</th></tr>
+        <tr><td><strong>吴凡</strong></td><td>D1-3: 实验执行监控 dashboard（运行中/成功/失败/GPU 利用率）<br>D4-5: 无状态服务改造 + 容器化部署</td><td>监控 dashboard<br>服务 Docker 化</td></tr>
+        <tr><td><strong>何天尧</strong></td><td>D1-3: Sandbox 安全隔离（每实验独立容器/资源限额/环境清理）<br>D4-5: 轨迹采集 SDK 正式版（step 级事件→Postgres 元数据+MinIO artifact）</td><td>Sandbox 隔离完成<br>采集 SDK v1.0</td></tr>
+        <tr><td><strong>栗维鸿</strong></td><td>D1-3: 对接何天尧真实轨迹流（替换 mock）<br>D4-5: 首批真实轨迹质检（目标 50-100 条）</td><td><strong>真实轨迹流通</strong><br>首批质检报告</td></tr>
+        <tr><td><strong>负责人</strong></td><td>D1-3: 审核首批真实轨迹质量<br>D4-5: Benchmark 半自动评测跑通（固定 5 个任务）</td><td>轨迹质量审核<br>半自动评测 demo</td></tr>
+    </table>
+
+    <h4>M3 验收（W6 末）</h4>
+    <span class="deliverable">50-100 条真实轨迹产出</span>
+    <span class="deliverable">质检通过率 > 50%</span>
+    <span class="deliverable">平台无状态、可横向扩展</span>
+    <span class="checkpoint">Agent 无人值守运行 10 轮不崩</span>
+</div>
+
+<!-- ===== Sprint 4: W7-W8 ===== -->
+<div class="sprint-card">
+    <div class="sprint-title">Sprint 4：规模化采集 + 训练准备</div>
+    <div class="sprint-date">7/7 — 7/18（第 7-8 周）| 里程碑 M4</div>
+
+    <h4>Week 7（7/7-7/11）</h4>
+    <table>
+        <tr><th width="12%">人员</th><th width="55%">每日任务（5 天）</th><th>交付物</th></tr>
+        <tr><td><strong>吴凡</strong></td><td>D1-5: 平台稳定性运维 + 容量扩展（支持 Agent 并行 8+ 实验）；处理线上 bug 和资源争用</td><td>平台支持 8 并行实验<br>bug 修复记录</td></tr>
+        <tr><td><strong>何天尧</strong></td><td>D1-5: 批量轨迹采集——Agent 7×24 运行，目标产出 200-300 条完整轨迹</td><td>200+ 条 raw 轨迹入库</td></tr>
+        <tr><td><strong>栗维鸿</strong></td><td>D1-3: 质检 pipeline 处理批量轨迹<br>D4-5: 训练数据集 v1 构造（过滤后 ≥ 100 条高质量 SFT 样本）</td><td>质检通过率报告<br>训练集 v1</td></tr>
+        <tr><td><strong>负责人</strong></td><td>D1-3: Benchmark 正式冻结（任务集/指标/baseline/评判规则不再变更）<br>D4-5: 数据集 v1 验收（抽检 20 条，判定是否可训练）</td><td><strong>Benchmark v1 冻结</strong><br>数据集 v1 验收</td></tr>
+    </table>
+
+    <h4>Week 8（7/14-7/18）</h4>
+    <table>
+        <tr><th width="12%">人员</th><th width="55%">每日任务（5 天）</th><th>交付物</th></tr>
+        <tr><td><strong>吴凡</strong></td><td>D1-3: 实验结果自动归档（按任务/日期/成功率整理）<br>D4-5: GPU 利用率优化（目标 ≥ 70% 有效利用）</td><td>自动归档系统<br>GPU 利用率报告</td></tr>
+        <tr><td><strong>何天尧</strong></td><td>D1-5: 持续采集 + 搜索策略调优（branching factor/剪枝阈值/探索-利用平衡）</td><td>搜索策略调优报告<br>累计 500+ 条轨迹</td></tr>
+        <tr><td><strong>栗维鸿</strong></td><td>D1-3: 训练集 v1 扩充（目标 ≥ 200 条 SFT 样本）<br>D4-5: ms-swift v4 训练配置调试（单卡验证→8 卡验证）</td><td>训练集 v1.1<br>多卡训练配置就绪</td></tr>
+        <tr><td><strong>负责人</strong></td><td>D1-3: 定义训练 v1 验收标准（在 Benchmark 上超过 base Qwen X%）<br>D4-5: 规划 DPO 数据需求</td><td>训练验收标准<br>DPO 预案</td></tr>
+    </table>
+
+    <h4>M4 验收（W8 末）</h4>
+    <span class="deliverable">Benchmark v1 冻结且可自动运行</span>
+    <span class="deliverable">训练集 v1 ≥ 200 条 clean samples</span>
+    <span class="deliverable">64 卡训练环境验证通过</span>
+    <span class="checkpoint">轨迹累计 500+ 条</span>
+</div>
+
+<!-- ===== Sprint 5: W9-W10 ===== -->
+<div class="sprint-card">
+    <div class="sprint-title">Sprint 5：Qwen 首训 + 闭环验证</div>
+    <div class="sprint-date">7/21 — 8/1（第 9-10 周）| 里程碑 M5</div>
+
+    <h4>Week 9（7/21-7/25）</h4>
+    <table>
+        <tr><th width="12%">人员</th><th width="55%">每日任务（5 天）</th><th>交付物</th></tr>
+        <tr><td><strong>吴凡</strong></td><td>D1-5: 平台运维 + 支撑 64 卡训练（GPU 分配: 48 卡训练 + 16 卡 Agent 采集）</td><td>GPU 分配方案执行<br>训练任务顺利调度</td></tr>
+        <tr><td><strong>何天尧</strong></td><td>D1-5: 用 16 卡继续采集（改分割任务为主）+ 轨迹质量分析（失败模式频率）</td><td>分割域轨迹 100+<br>失败模式分析报告</td></tr>
+        <tr><td><strong>栗维鸿</strong></td><td>D1-5: <strong>Qwen 首训 v1</strong>——48 卡 SFT，base model + 200 条轨迹，3-5 天训练</td><td><strong>Qwen-AutoResearch v1 checkpoint</strong></td></tr>
+        <tr><td><strong>负责人</strong></td><td>D1-2: 训练过程监控（loss 曲线/梯度/收敛）<br>D3-5: 准备首轮 Benchmark 评测环境</td><td>训练监控报告<br>评测环境 ready</td></tr>
+    </table>
+
+    <h4>Week 10（7/28-8/1）</h4>
+    <table>
+        <tr><th width="12%">人员</th><th width="55%">每日任务（5 天）</th><th>交付物</th></tr>
+        <tr><td><strong>吴凡</strong></td><td>D1-5: 支撑评测运行（Benchmark 需要的实验环境）；平台稳定性持续</td><td>评测环境稳定运行</td></tr>
+        <tr><td><strong>何天尧</strong></td><td>D1-3: 持续采集 + DPO 正负样本对构造<br>D4-5: 根据首训结果分析轨迹质量 gap</td><td>DPO 样本对 50+<br>质量 gap 分析</td></tr>
+        <tr><td><strong>栗维鸿</strong></td><td>D1-3: model_manifest.yaml 填写 + 提交负责人<br>D4-5: 根据评测结果分析训练改进方向</td><td>model_manifest v1<br>改进方向文档</td></tr>
+        <tr><td><strong>负责人</strong></td><td>D1-5: <strong>首轮 Benchmark 评测</strong>——Qwen v1 vs Codex/Claude Code vs base Qwen</td><td><strong>首轮评测报告（含逐任务对比）</strong></td></tr>
+    </table>
+
+    <h4>M5 验收（W10 末）</h4>
+    <span class="deliverable">Qwen v1 checkpoint 交付</span>
+    <span class="deliverable">首轮评测报告完成</span>
+    <span class="deliverable">v1 在 Benchmark 上超过 base model</span>
+    <span class="checkpoint">微调模型能驱动闭环运行</span>
+</div>
+
+<!-- ===== Sprint 6: W11-W12 ===== -->
+<div class="sprint-card">
+    <div class="sprint-title">Sprint 6：迭代优化 + 最终验收</div>
+    <div class="sprint-date">8/4 — 8/15（第 11-12 周）| 里程碑 M6</div>
+
+    <h4>Week 11（8/4-8/8）</h4>
+    <table>
+        <tr><th width="12%">人员</th><th width="55%">每日任务（5 天）</th><th>交付物</th></tr>
+        <tr><td><strong>吴凡</strong></td><td>D1-5: 根据评测暴露的问题修复平台 issue；支撑第二轮训练</td><td>issue 修复<br>平台稳定</td></tr>
+        <tr><td><strong>何天尧</strong></td><td>D1-5: Agent 策略优化（针对首训暴露的失败模式，改搜索/规划/诊断逻辑）；高质量轨迹增量采集</td><td>Agent v2<br>增量轨迹 200+</td></tr>
+        <tr><td><strong>栗维鸿</strong></td><td>D1-3: <strong>训练 v2</strong>——SFT+DPO（若 v1 SFT 不够）或扩充数据重训<br>D4-5: 训练策略调优（学习率/数据配比/epoch）</td><td><strong>Qwen-AutoResearch v2</strong></td></tr>
+        <tr><td><strong>负责人</strong></td><td>D1-3: v1 评测结果深度分析（哪些任务失败、为什么）<br>D4-5: 输出改进优先级给团队</td><td>失败案例分析<br>改进优先级列表</td></tr>
+    </table>
+
+    <h4>Week 12（8/11-8/15）</h4>
+    <table>
+        <tr><th width="12%">人员</th><th width="55%">每日任务（5 天）</th><th>交付物</th></tr>
+        <tr><td><strong>吴凡</strong></td><td>D1-3: 最终平台文档（部署手册/运维手册/接口文档）<br>D4-5: 技术债清理</td><td>完整运维文档</td></tr>
+        <tr><td><strong>何天尧</strong></td><td>D1-3: 系统架构文档 + 代码整理<br>D4-5: 技术报告（Agent 设计/搜索策略/轨迹质量分析）</td><td>架构文档<br>技术报告</td></tr>
+        <tr><td><strong>栗维鸿</strong></td><td>D1-3: model_manifest v2 提交<br>D4-5: 训练报告（数据/超参/消融实验总结）</td><td>model_manifest v2<br>训练报告</td></tr>
+        <tr><td><strong>负责人</strong></td><td>D1-5: <strong>最终验收</strong>——Benchmark 盲测 v2 vs Codex/Claude Code vs base Qwen；项目总结</td><td><strong>最终评测报告</strong><br>项目总结文档</td></tr>
+    </table>
+
+    <h4>M6 验收（W12 末）</h4>
+    <span class="deliverable">v2 模型在 Benchmark 上显著超过 base model</span>
+    <span class="deliverable">CV 科研能力接近 Codex/Claude Code 水平</span>
+    <span class="deliverable">300+ 条高质量轨迹</span>
+    <span class="deliverable">完整技术报告 + 数据卡</span>
+    <span class="checkpoint">全部可复现</span>
+</div>
+
+<!-- 收尾 -->
+<div class="sprint-card" style="border-left-color: var(--accent);">
+    <div class="sprint-title" style="color: var(--accent);">收尾：交付与复盘（第 13 周，8/18-8/22）</div>
+    <ul>
+        <li>完整闭环演示（从任务下发到轨迹产出到模型评测）</li>
+        <li>数据报告、模型报告、复现实验脚本</li>
+        <li>项目复盘 + 下一阶段方向决定</li>
+        <li>开源准备（数据集 + 代码 + 模型权重）</li>
+    </ul>
+</div>
+
+<h3>4.4 GPU 动态分配策略</h3>
+<table>
+    <tr><th>阶段</th><th>Agent 采集</th><th>CV 基线/实验</th><th>模型训练</th><th>评测</th></tr>
+    <tr><td>W1-W4（搭建期）</td><td>0</td><td>16</td><td>8（环境调试）</td><td>0</td></tr>
+    <tr><td>W5-W8（采集期）</td><td>16-24</td><td>8</td><td>8（调试）</td><td>4</td></tr>
+    <tr><td>W9-W10（训练期）</td><td>16</td><td>0</td><td>48</td><td>0</td></tr>
+    <tr><td>W11-W12（优化期）</td><td>8</td><td>0</td><td>32-48</td><td>8</td></tr>
+</table>
+
+<h3>4.5 集成节奏</h3>
+<table>
+    <tr><th>频率</th><th>活动</th><th>参与者</th><th>时长</th></tr>
+    <tr><td>每日</td><td>异步 standup（文字，3 句话：做了/卡了/明天）</td><td>全员</td><td>5min</td></tr>
+    <tr><td>每周五</td><td>Demo + 集成测试（各模块最新版联调）</td><td>全员</td><td>1h</td></tr>
+    <tr><td>每 2 周</td><td>Sprint Review（里程碑检查 + 下 Sprint 规划）</td><td>全员</td><td>2h</td></tr>
+    <tr><td>触发式</td><td>接口变更评审（任何 field 变动需 4 人确认）</td><td>全员</td><td>30min</td></tr>
+</table>
+
+<!-- ==================== Section 4 ==================== -->
+<h2 id="modules">5. 系统模块拆分（7 大模块 × 4 人）</h2>
+
+<p>核心设计原则：<strong>按产品面划分，不按技术栈碎片化拆。</strong>每人负责的模块尽量闭环，跨人接口极简。</p>
+
+<div class="key-insight">
+    <strong>分配逻辑：</strong>吴凡(M1+M2) = 稳定实验底座 → 何天尧(M3+M4) = Agent 核心闭环 → 栗维鸿(M5+M6) = 轨迹炼金术 → 负责人(M7) = 质量门禁
+</div>
+
+<div class="module-card">
+    <div class="module-name">M1: GPU 集群环境与镜像管理</div>
+    <span class="module-owner">Owner: 吴凡</span>
+    <p style="margin-top:10px;">CUDA/NCCL 环境、Docker 镜像构建分发、Slurm 作业模板、GPU 资源分配脚本。<br>
+    <strong>验收标准：</strong>何天尧和栗维鸿各自拉镜像后 5 分钟内能跑通实验。</p>
+</div>
+
+<div class="module-card">
+    <div class="module-name">M2: CV 基线训练与评测平台</div>
+    <span class="module-owner">Owner: 吴凡</span>
+    <p style="margin-top:10px;">Ultralytics YOLO26（检测）+ HuggingFace Transformers + Mask2Former（分割）训练脚本、标准接口 <code>run_experiment(spec.yaml) → result.json</code>、baseline 复现。<br>
+    <strong>验收标准：</strong>给任何合法 config 都能在约定时间内返回正确结果。SLA > 99%。</p>
+</div>
+
+<div class="module-card" style="border-color: var(--accent);">
+    <div class="module-name">M3: Agent 编排与执行引擎</div>
+    <span class="module-owner">Owner: 何天尧 <span class="tag tag-critical">核心模块</span></span>
+    <p style="margin-top:10px;">LangGraph 状态机、AIDE 式树搜索 + metric-driven 剪枝、Sandbox 容器编排、实验执行调度。<br>
+    <strong>隔离方案：</strong>每个 episode 独立容器 + Git worktree + 只读数据挂载 + 网络白名单。</p>
+</div>
+
+<div class="module-card" style="border-color: var(--accent);">
+    <div class="module-name">M4: 轨迹数据采集与存储</div>
+    <span class="module-owner">Owner: 何天尧 <span class="tag tag-mvp">与 M3 高耦合，必须同人</span></span>
+    <p style="margin-top:10px;">轨迹 Schema 设计、step 级自动记录（thought/action/observation/reward）、Postgres 元数据、MinIO artifact 存储。<br>
+    <strong>耦合说明：</strong>轨迹结构是 Agent 状态机的一部分——状态变则 Schema 变，拆给两人会产生大量隐性沟通。</p>
+</div>
+
+<div class="module-card">
+    <div class="module-name">M5: 数据质检与过滤</div>
+    <span class="module-owner">Owner: 栗维鸿 <span class="tag tag-full">含研究探索</span></span>
+    <p style="margin-top:10px;">轨迹去重、失败归因分类、reward 重算/过程 reward 建模、质量评分、SFT/DPO 格式转换。<br>
+    <strong>研究问题：</strong>什么轨迹值得训练？成功/失败修复/无效探索如何分类打分？DPO 正负对如何构造？</p>
+</div>
+
+<div class="module-card">
+    <div class="module-name">M6: 模型训练 Pipeline</div>
+    <span class="module-owner">Owner: 栗维鸿 <span class="tag tag-full">含研究探索</span></span>
+    <p style="margin-top:10px;">Qwen SFT/LoRA/DPO 训练、训练策略探索（配比/格式/方法对比）、64 卡分布式、checkpoint 管理。<br>
+    <strong>技术栈：</strong>ms-swift v4（首选，阿里官方 Qwen 原生支持）+ DeepSpeed ZeRO-3 / FSDP2 + W&B 实验追踪。<br>
+    <strong>约束：</strong>先保证 SFT 主线可复现跑通，DPO/配比作为次级探索。</p>
+</div>
+
+<div class="module-card">
+    <div class="module-name">M7: Auto Research Benchmark 评测</div>
+    <span class="module-owner">Owner: 负责人</span>
+    <p style="margin-top:10px;">固定任务集定义、预算约束、评分维度、自动评测脚本、对标实验（Codex/Claude Code/base Qwen）。<br>
+    <strong>评分维度：</strong>任务成功率 + 代码 patch 正确率 + 诊断准确率 + 资源效率 + 轨迹质量。</p>
+</div>
+
+<!-- ==================== Section 5 ==================== -->
+<h2 id="assignments">6. 分工安排与协作机制</h2>
+
+<h3>6.1 每人一句话定位</h3>
+
+<table>
+    <tr><th>人员</th><th>负责模块</th><th>一句话定位</th><th>核心关键词</th></tr>
+    <tr><td><strong>何天尧</strong></td><td>M3 + M4</td><td>"让 Agent 能自动做 CV 实验并记录全过程"</td><td>核心闭环、独立推进</td></tr>
+    <tr><td><strong>栗维鸿</strong></td><td>M5 + M6</td><td>"把轨迹数据炼成能让 Qwen 变强的训练集"</td><td>研究探索、论文驱动</td></tr>
+    <tr><td><strong>吴凡</strong></td><td>M1 + M2</td><td>"保证给什么 config 都能稳定跑出结果"</td><td>明确 spec、快速交付</td></tr>
+    <tr><td><strong>负责人</strong></td><td>M7</td><td>"定义什么叫'好'，并验证是否达标"</td><td>质量门禁、方向决策</td></tr>
+</table>
+
+<h3>6.2 角色边界</h3>
+
+<div class="person-card" style="border-color: var(--accent);">
+    <div class="name">何天尧 — Agent 架构师（M3 + M4）</div>
+    <div class="role">项目技术核心。独立设计并实现 Auto Research 全闭环。</div>
+    <ul>
+        <li>LangGraph 状态机设计与实现</li>
+        <li>搜索策略：AIDE 式树搜索 + metric-driven 剪枝 + 回退</li>
+        <li>Sandbox 容器编排（隔离执行、GPU quota、超时、网络白名单）</li>
+        <li>轨迹 Schema 设计 + 采集 SDK + 存储系统</li>
+        <li>并行调度（多实例运行 + 失败重试 + 监控）</li>
+    </ul>
+    <div class="boundary"><strong>边界：</strong>不写 CV 训练脚本（调用吴凡的接口）；不做质检/训练（输出 JSONL 给栗维鸿）。</div>
+</div>
+
+<div class="person-card">
+    <div class="name">栗维鸿 — 数据科学家（M5 + M6）</div>
+    <div class="role">研究型产出。探索"什么轨迹值得训练、怎么训最有效"。</div>
+    <ul>
+        <li>轨迹质量建模：成功/失败修复/无效探索分类 + 评分</li>
+        <li>Reward 建模：终端 reward vs 过程 reward 对比研究</li>
+        <li>格式探索：完整 episode vs action-level、DPO pair 构造方法</li>
+        <li>训练策略：LoRA vs full SFT、数据配比实验、多策略消融</li>
+        <li>ms-swift v4 + DeepSpeed 训练管线搭建与运行</li>
+    </ul>
+    <div class="boundary"><strong>边界：</strong>不动 Agent 内部代码；只消费 trajectory.jsonl。<strong>约束：</strong>先保证 SFT 主线跑通，DPO 作为次级探索。</div>
+</div>
+
+<div class="person-card">
+    <div class="name">吴凡 — 平台工程师（M1 + M2）</div>
+    <div class="role">稳定底座。给定 spec 保证稳定输出。</div>
+    <ul>
+        <li>Docker 镜像构建与版本管理（CUDA/PyTorch/MM系列）</li>
+        <li>Slurm 作业模板 + GPU 资源分配脚本</li>
+        <li>Ultralytics YOLO26 / HF Transformers + Mask2Former 训练评测脚本</li>
+        <li>标准接口封装：<code>run_experiment(spec.yaml) → result.json</code></li>
+        <li>Baseline 结果复现 + 服务稳定性运维</li>
+    </ul>
+    <div class="boundary"><strong>边界：</strong>不负责 Agent 决策逻辑、不做质检策略、不判断"什么数据有价值"。验收标准明确：给任何合法 config 都能在约定时间内返回正确结果。</div>
+</div>
+
+<div class="person-card">
+    <div class="name">负责人 — 质量门禁（M7）</div>
+    <div class="role">定义"好"的标准，验证是否达标。</div>
+    <ul>
+        <li>Auto Research Benchmark 定义（任务集 + 评分维度 + 预算约束）</li>
+        <li>Codex/Claude Code baseline 对照实验</li>
+        <li>每双周闭环实战日（全员 review 失败轨迹）</li>
+        <li>每周 kill/keep 决策：哪个方向止损</li>
+        <li>最终盲测验收 + 技术报告</li>
+    </ul>
+    <div class="boundary"><strong>边界：</strong>不写框架代码。但审核 Schema 设计、数据质量、评测结果。50-70% 投入。<strong>从 W1 就输出评测标准</strong>，不等 W7。</div>
+</div>
+
+<h3>6.3 代码仓库（Monorepo）</h3>
+<div class="repo-tree">
+auto-research-workspace/
+├── agent/                  # M3+M4 Agent 核心 (Owner: 何天尧)
+│   ├── engine.py           # LangGraph 状态机
+│   ├── search.py           # 树搜索策略
+│   ├── sandbox.py          # Sandbox 执行器
+│   ├── recorder.py         # 轨迹采集 SDK
+│   ├── storage.py          # Postgres + MinIO 存储
+│   └── schemas/            # trajectory_schema.json
+├── cv_platform/            # M1+M2 实验平台 (Owner: 吴凡)
+│   ├── docker/             # Dockerfile + 镜像构建
+│   ├── slurm/              # Slurm 模板
+│   ├── configs/            # Ultralytics/HF 配置
+│   ├── scripts/            # 训练评测脚本
+│   └── interface.py        # run_experiment(spec) → result
+├── data_training/          # M5+M6 质检与训练 (Owner: 栗维鸿)
+│   ├── filtering/          # 质检过滤规则
+│   ├── reward/             # reward 重算/建模
+│   ├── conversion/         # SFT/DPO 格式转换
+│   ├── training/           # ms-swift v4 配置 + 脚本
+│   └── experiments/        # 训练策略实验记录
+├── benchmark/              # M7 评测 (Owner: 负责人)
+│   ├── tasks/              # 固定任务集
+│   ├── evaluator.py        # 自动评测
+│   └── reports/            # 评测报告
+├── interfaces/             # 跨模块接口定义（全员维护）
+│   ├── experiment_spec.schema.yaml
+│   ├── experiment_result.schema.json
+│   ├── trajectory.schema.json
+│   └── model_manifest.schema.yaml
+├── mocks/                  # Mock 数据（W1-W4 解耦用）
+│   ├── mock_results/       # 3 种 experiment_result
+│   ├── mock_trajectories/  # 50 条合成轨迹
+│   └── mock_manifest/      # dummy model manifest
+├── docs/
+└── tests/
+</div>
+
+<!-- ==================== Section 6 ==================== -->
+<h2 id="quality">7. 质量标准与验收机制</h2>
+
+<h3>7.1 每次 Sprint 验收的四条卡口</h3>
+<div class="key-insight">
+    <ol>
+        <li><strong>能否一键复现？</strong> — 任何人拉代码后能直接跑通</li>
+        <li><strong>是否产生了真实轨迹数据？</strong> — 不是只写了代码，而是有实际产出</li>
+        <li><strong>是否有自动化指标？</strong> — 不靠主观判断，有数字可看</li>
+        <li><strong>是否有人审过样本质量？</strong> — 至少抽检 10 条轨迹</li>
+    </ol>
+</div>
+
+<h3>7.2 数据入库门禁（三阶段）</h3>
+<table>
+    <tr><th>阶段</th><th>规则</th><th>不通过则</th></tr>
+    <tr><td>语法校验</td><td>代码编译/执行无致命错误</td><td>标记为 invalid，不入训练集</td></tr>
+    <tr><td>步数校验</td><td>3 步 ≤ 总步数 ≤ 30 步</td><td>太短=无价值，太长=可能死循环</td></tr>
+    <tr><td>收益校验</td><td>至少一次正向指标提升</td><td>纯失败轨迹仅用于 DPO 负样本</td></tr>
+</table>
+
+<h3>7.3 评测目标量化定义</h3>
+
+<div class="info-box">
+    <p><strong>对标对象：</strong>Codex / Claude Code 在 CV 科研任务上的表现。我们的目标是让 Qwen-AutoResearch 在自建 Benchmark 上达到接近这些系统 70-80% 的水平。</p>
+</div>
+
+<table>
+    <tr><th>指标</th><th>含义</th><th>目标</th></tr>
+    <tr><td>任务成功率</td><td>完成有效改进的比例</td><td>≥ 40%（Codex 级约 60%）</td></tr>
+    <tr><td>代码 Patch 成功率</td><td>生成修改一次跑通率</td><td>≥ 50%</td></tr>
+    <tr><td>诊断准确率</td><td>失败原因判断正确率</td><td>人类盲评胜率 > 55%</td></tr>
+    <tr><td>实验收益</td><td>平均 mAP/mIoU 提升</td><td>高于 base Qwen 30%+</td></tr>
+    <tr><td>资源效率</td><td>达到相同提升的 GPU 小时</td><td>低于 random search baseline</td></tr>
+</table>
+
+<!-- ==================== Section 7 ==================== -->
+<h2 id="risks">8. 风险与应急方案</h2>
+
+<h3>8.1 关键技术风险</h3>
+<table>
+    <tr><th>风险</th><th>概率</th><th>影响</th><th>应急方案</th></tr>
+    <tr><td><span class="tag tag-critical">高</span> Agent 轨迹质量持续低下</td><td>中</td><td>训练无效</td><td>Plan B: GPT-5.5 生成 teacher 轨迹补充；Plan C: 人工修正 50 条种子轨迹</td></tr>
+    <tr><td><span class="tag tag-critical">高</span> 闭环工程不稳定</td><td>中</td><td>采集停滞</td><td>Sandbox 超时 + GPU quota + 进程清理；Agent 可降级为 CLI 直接提交实验</td></tr>
+    <tr><td><span class="tag tag-critical">高</span> 核心模块知识集中度过高</td><td>中</td><td>进度受阻</td><td>W2 前各模块 Owner 输出设计文档+架构说明；相邻模块 Owner 互为 backup（详见下方备份矩阵）</td></tr>
+    <tr><td>64 卡训练 OOM/通信失败</td><td>中</td><td>训练延迟</td><td>准备 8 卡 LoRA 备选方案；准备不同并行策略 Slurm 模板</td></tr>
+    <tr><td>CV 平台服务不稳定</td><td>中低</td><td>Agent 被卡</td><td>Mock 策略解耦（§4.1）；Agent 可直接 CLI 提交实验绕过服务层</td></tr>
+    <tr><td>Benchmark 设计有偏差</td><td>低</td><td>评测失真</td><td>保留 5 个"blind test"任务 W8 前不暴露给 Agent；动态更新评测集</td></tr>
+    <tr><td>探索性任务挤占主线进度</td><td>中</td><td>核心交付延迟</td><td>硬规则：主线（SFT 跑通 + 质检上线）未验收前，探索性工作不超过每周 1 天</td></tr>
+    <tr><td>接口定义频繁变更</td><td>中低</td><td>集成返工</td><td>接口 v0.1 在 W3 冻结，后续只允许向后兼容扩展；变更需 4 人会议确认</td></tr>
+</table>
+
+<div class="info-box">
+    <strong>知识备份矩阵（降低 bus factor）：</strong>
+    <table style="margin-top:8px;">
+        <tr><th>模块</th><th>Primary Owner</th><th>Backup</th><th>备份方式</th></tr>
+        <tr><td>M1+M2 实验平台</td><td>吴凡</td><td>何天尧</td><td>接口文档 + Slurm 模板共享</td></tr>
+        <tr><td>M3+M4 Agent 核心</td><td>何天尧</td><td>栗维鸿</td><td>W2 设计文档 + 周五 code review</td></tr>
+        <tr><td>M5+M6 质检训练</td><td>栗维鸿</td><td>何天尧</td><td>质检规则文档 + 训练配置版本化</td></tr>
+        <tr><td>M7 Benchmark</td><td>负责人</td><td>全员</td><td>评测脚本自动化，任何人可运行</td></tr>
+    </table>
+</div>
+
+<h3>8.2 时间缓冲设计</h3>
+<table>
+    <tr><th>阶段</th><th>缓冲设计</th><th>说明</th></tr>
+    <tr><td>W3-W4</td><td>Mock 策略保证 Agent 开发不阻塞</td><td>CV 平台 delay 3 天不影响 Agent 进度</td></tr>
+    <tr><td>W5-W6</td><td>质检 pipeline 已用 mock 数据开发完毕</td><td>真实轨迹晚几天不致命，切换数据源即可</td></tr>
+    <tr><td>W7-W8</td><td>轨迹数量弹性目标（底线 100，理想 500）</td><td>质量 > 数量，100 条高质也能首训</td></tr>
+    <tr><td>W9-W10</td><td>训练时间有 1 周 buffer</td><td>SFT 实际 3-5 天够，W10 下半周可 quick iterate</td></tr>
+    <tr><td>W11-W12</td><td>整个 Sprint 是优化+兜底</td><td>只做定向修复，不大改架构</td></tr>
+</table>
+
+<h3>8.3 十条红线</h3>
+<div class="warning-box">
+    <ol>
+        <li><strong>不要把项目做成 CV 竞赛</strong> — 核心产出是轨迹数据，不是 mAP 分数</li>
+        <li><strong>只存结果不存过程 = 无效</strong> — 没有 thought/action/observation 的数据不可训练</li>
+        <li><strong>不允许各写各的日志格式</strong> — 统一 Schema 第一天定死</li>
+        <li><strong>不要过早追求复杂 Agent</strong> — 先单 Agent 跑通再迭代</li>
+        <li><strong>实验必须可复现</strong> — 种子/版本/config/数据全部入库</li>
+        <li><strong>评估口径不能变</strong> — 指标从第一周固定</li>
+        <li><strong>每双周必须人工抽检轨迹</strong> — 不抽检就会规模化制造垃圾</li>
+        <li><strong>先定义模型要学什么行为，再采数据</strong></li>
+        <li><strong>Agent 禁止写共享基线目录</strong> — 只允许提交 patch/diff</li>
+        <li><strong>遇到阻塞当天上报</strong> — 不要等到双周 Review</li>
+    </ol>
+</div>
+
+<!-- ==================== Section 8 ==================== -->
+<h2 id="glossary">9. 术语表</h2>
+
+<div class="glossary">
+    <dl>
+        <dt>Auto Research / AI Scientist</dt>
+        <dd>让 AI 自动完成科研全流程：提出假设 → 写代码 → 跑实验 → 分析结果 → 迭代改进。</dd>
+
+        <dt>Agentic 轨迹数据（Agentic Trajectory）</dt>
+        <dd>Agent 解决任务的完整过程记录：目标→计划→工具调用→代码修改→实验结果→反思→下一步。</dd>
+
+        <dt>Mock/Stub 策略</dt>
+        <dd>用模拟数据代替真实接口，让下游在上游未就绪时仍能独立开发。本项目的核心并行化手段。</dd>
+
+        <dt>LangGraph</dt>
+        <dd>LangChain 出品的有状态 Agent 编排框架。支持 durable execution、checkpoint、人工接管。</dd>
+
+        <dt>AIDE（WecoAI）</dt>
+        <dd>将 ML 工程看作代码空间中的树搜索：每个节点是一个方案，metric 反馈驱动剪枝。</dd>
+
+        <dt>MLAgentBench</dt>
+        <dd>Stanford 出品的 ML Agent 评测框架。13 个端到端 ML 实验任务，评估 Agent 改进模型的能力。</dd>
+
+        <dt>轨迹 Schema</dt>
+        <dd>episode_id / task{domain, metric, goal, budget} / state / step{thought, action, observation, reward} / artifacts / labels</dd>
+
+        <dt>SFT（Supervised Fine-Tuning）</dt>
+        <dd>监督微调。用"任务→正确轨迹"对来训练模型。</dd>
+
+        <dt>DPO（Direct Preference Optimization）</dt>
+        <dd>偏好优化。同一任务给模型看"成功轨迹"和"失败轨迹"，学会区分好坏。</dd>
+
+        <dt>Sandbox（实验沙箱）</dt>
+        <dd>隔离容器环境。每次 Agent 实验在独立容器中运行，GPU quota + 超时 + 网络白名单，防止互相干扰。</dd>
+
+        <dt>Error-driven Synthesis</dt>
+        <dd>针对模型当前失败模式，专门生成对应训练数据。"哪里弱就补哪里"。</dd>
+
+        <dt>Smoke / Tiny / Full</dt>
+        <dd>多级实验：Smoke（5分钟验证代码能跑）→ Tiny（30分钟小数据验证方向）→ Full（完整训练）。</dd>
+    </dl>
+</div>
+
+<hr style="margin-top: 50px; border: none; border-top: 2px solid #eee;">
+<p style="text-align: center; color: #999; font-size: 0.85em; margin-top: 20px;">
+    Auto Research 项目启动文档 v3.0 | 基模数据团队 | 2026.05.26<br>
+    CCG 验证：Claude Opus 4.6 + GPT-5.5 (Codex)<br>
+    并行执行 + Mock 解耦 | 12 周逐周路线图 | 6 大里程碑 | 4 人全程并行
+</p>
+
+</div>
+</body>
+</html>
