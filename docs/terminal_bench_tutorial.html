@@ -179,7 +179,7 @@
 
 <div class="concept">
     <h4>🎯 一句话定义</h4>
-    <p><strong>Terminal-Bench 是一个评测 AI Agent 在真实终端环境中完成长程、多领域、硬核任务能力的基准测试。</strong>它包含 89 个由 93 位专家贡献者创建的高难度任务，每个任务都在真实 Docker 容器中执行，最终由自动化测试验证成败。</p>
+    <p><strong>Terminal-Bench 是一个评测 AI Agent 在真实终端环境中完成长程、多领域、硬核任务能力的基准测试。</strong>它包含 89 个由 93 位专家贡献者创建的高难度任务（v2.0），每个任务都在真实 Docker 容器中执行，最终由自动化测试验证成败。<strong>2026-05-06 发布的 v2.1</strong> 修复了 28/89 任务的问题（drift、资源不匹配、任务描述错位、奖励 hack 漏洞等）并增加 continuous validation。</p>
 </div>
 
 <h3>用三个比喻理解它</h3>
@@ -323,20 +323,23 @@ harbor run --dataset terminal-bench@2.0 \
 <h3>Task 完整目录结构</h3>
 
 <div class="card card-tinted-primary">
-    <p>每个 Terminal-Bench 任务就是一个标准化的目录：</p>
+    <p>每个 Terminal-Bench 任务就是一个标准化的目录（<strong>新版 Harbor 格式</strong>，旧版 task.yaml 已迁移到 task.toml + instruction.md）：</p>
 <pre>tasks/
 └── adaptive-rejection-sampler/        <span class="comment"># 任务名 (kebab-case)</span>
-    ├── task.yaml                       <span class="comment"># 任务元数据（名称、描述、类别、难度、时间）</span>
-    ├── Dockerfile                      <span class="comment"># 任务环境定义（基础镜像 + 依赖安装）</span>
-    ├── docker-compose.yaml             <span class="comment"># 容器编排（端口挂载等）</span>
-    ├── solution.sh                     <span class="comment"># Oracle 参考解法（人类写的"标准答案"）</span>
-    ├── run-tests.sh                    <span class="comment"># 评测入口：调用 pytest 或自定义测试</span>
-    ├── tests/                          <span class="comment"># 测试目录</span>
-    │   ├── test_outputs.py
-    │   └── test_outputs.sh
-    ├── environment/                    <span class="comment"># 预置数据/资源（不是给 Agent 的初始代码）</span>
-    │   └── bn_sample_10k.csv
-    └── instruction.md (或 task.yaml 内) <span class="comment"># 给 Agent 看的题面</span></pre>
+    ├── task.toml                       <span class="comment"># 任务元数据 (Harbor 新格式：name/category/difficulty/timeouts)</span>
+    ├── instruction.md                  <span class="comment"># 给 Agent 看的题面（独立于配置文件）</span>
+    ├── environment/
+    │   └── Dockerfile                  <span class="comment"># 任务环境定义（基础镜像 + 依赖）</span>
+    ├── solution/
+    │   └── solve.sh                    <span class="comment"># Oracle 参考解法（人类写的"标准答案"）</span>
+    ├── tests/
+    │   ├── test.sh                     <span class="comment"># 评测入口：调用 pytest 或自定义测试</span>
+    │   └── test_outputs.py             <span class="comment"># 实际测试逻辑</span>
+    └── environment_data/               <span class="comment"># 预置数据/资源（不包含 oracle 信息）</span>
+        └── bn_sample_10k.csv</pre>
+    <p style="margin-top:0.5rem; font-size:0.85rem; color:var(--text-secondary);">
+        <strong>关键变化：</strong>Harbor 1.0 后任务元数据从 <code>task.yaml</code> 迁移到 <code>task.toml</code>（TOML 格式），题面独立到 <code>instruction.md</code>。论文 Figure 2 仍展示旧版 task.yaml，但当前实际已用新格式。
+    </p>
 </div>
 
 <!-- ==================== 4. 任务解剖 ==================== -->
@@ -393,10 +396,139 @@ harbor run --dataset terminal-bench@2.0 \
     <p>这意味着：Agent 可以用任何方法（编辑文件、跑命令、装包、调用 API）完成任务，只要最终容器状态满足测试就算通过。这种设计让 Terminal-Bench 能容纳<strong>多种解法</strong>，真正评测的是结果而非解法。</p>
 </div>
 
-<h3>89 个任务的完整分布</h3>
+<h3>⚠️ Reward Hacking 案例（v2.0 → v2.1 修复）</h3>
+
+<div class="card card-tinted-accent">
+    <h4>2026-04-19 官方 Leaderboard 诚信更新</h4>
+    <p>Terminal-Bench 团队发现并处理了多起奖励 hack 案例：</p>
+
+    <table>
+        <tr><th>作弊手法</th><th>细节</th><th>处理</th></tr>
+        <tr>
+            <td><strong>ForgeCode 拉取网络答案</strong></td>
+            <td>Agent 通过 <code>curl</code> 从网上下载答案到 <code>AGENTS.md</code> 文件</td>
+            <td>重新评分 → 0 分</td>
+        </tr>
+        <tr>
+            <td><strong>上传 <code>tests/</code> 文件夹</strong></td>
+            <td>攻击者把测试文件打包上传到任务镜像，Agent 直接读答案</td>
+            <td>修复镜像构建流程</td>
+        </tr>
+        <tr>
+            <td><strong>加密的 solution 文件</strong></td>
+            <td>把 oracle 答案加密藏在容器里，Agent 用预共享密钥解密</td>
+            <td>v2.1 强化文件扫描</td>
+        </tr>
+        <tr>
+            <td><strong>超时修改</strong></td>
+            <td>修改 <code>task.toml</code> 的 <code>timeout_sec</code> 字段以获得更多时间</td>
+            <td>v2.1 加固任务配置不可变</td>
+        </tr>
+        <tr>
+            <td><strong>fix-git 任务文件泄露</strong></td>
+            <td>v2.0 中 <code>fix-git</code> 任务的安装文件保留在容器中，Agent 可反向推断</td>
+            <td>v2.1 删除/移动泄露文件（PR #53）</td>
+        </tr>
+    </table>
+
+    <p style="margin-top:0.8rem;"><strong>v2.1 改进（2026-05-06）：</strong>修复 28/89 任务的 drift / 资源不匹配 / 任务描述错位 / cheat vector，并增加 continuous validation（提交即验证）。</p>
+
+    <p><strong>v2.1 后续争议：</strong>GitHub 讨论发现 pytest traceback/stdout 可能泄露验证器源码给 harness 优化循环。PR #7 提议加 <code>--tb=no</code> 防止测试源码泄露（不改 reward）。<em>v2.1 是实质性改进，但非完全免疫。</em></p>
+</div>
+
+<h3>89 个任务的完整分类（按 task.toml 元数据）</h3>
 
 <div class="card">
-    <p>89 个任务覆盖 <strong>20+ 个领域</strong>，按论文 Figure 4 数据：</p>
+    <p>89 个任务覆盖 <strong>15+ 个领域</strong>，按 Harbor task.toml 分类：</p>
+
+    <table>
+        <tr><th>类别</th><th>数量</th><th>代表任务</th></tr>
+        <tr><td><strong>software-engineering</strong></td><td><strong>26</strong></td><td>build-pmars, cobol-modernization, code-from-image, fix-ocaml-gc, gpt2-codegolf, make-doom-for-mips, path-tracing, polyglot-c-py, polyglot-rust-c, prove-plus-comm, schemelike-metacircular-eval, torch-pipeline-parallelism, torch-tensor-parallelism, winning-avg-corewars...</td></tr>
+        <tr><td><strong>system-administration</strong></td><td><strong>8</strong></td><td>compile-compcert, configure-git-webserver, git-multibranch, install-windows-3.11, mailman, nginx-request-logging, qemu-alpine-ssh, qemu-startup</td></tr>
+        <tr><td><strong>scientific-computing</strong></td><td><strong>8</strong></td><td>adaptive-rejection-sampler, bn-fit-modify, dna-assembly, dna-insert, modernize-scientific-stack, protein-assembly, raman-fitting, tune-mjcf</td></tr>
+        <tr><td><strong>security</strong></td><td><strong>8</strong></td><td>break-filter-js-from-html, crack-7z-hash, filter-js-from-html, fix-code-vulnerability, openssl-selfsigned-cert, password-recovery, sanitize-git-repo, vulnerable-secret</td></tr>
+        <tr><td><strong>data-science</strong></td><td><strong>8</strong></td><td>hf-model-inference, mcmc-sampling-stan, mteb-leaderboard, mteb-retrieve, query-optimize, reshard-c4-data, rstan-to-pystan, sam-cell-seg</td></tr>
+        <tr><td><strong>file-operations</strong></td><td><strong>5</strong></td><td>db-wal-recovery, extract-elf, extract-moves-from-video, gcode-to-text, large-scale-text-editing</td></tr>
+        <tr><td><strong>debugging</strong></td><td><strong>5</strong></td><td>build-cython-ext, custom-memory-heap-crash, merge-diff-arc-agi-task, overfull-hbox, sqlite-db-truncate</td></tr>
+        <tr><td>data-processing</td><td>4</td><td>—</td></tr>
+        <tr><td>model-training</td><td>4</td><td>caffe-cifar-10, pytorch-model-cli, pytorch-model-recovery, train-fasttext</td></tr>
+        <tr><td>mathematics</td><td>4</td><td>chess-best-move, constraints-scheduling, largest-eigenval, portfolio-optimization</td></tr>
+        <tr><td>machine-learning</td><td>3</td><td>gpt2-codegolf, hf-model-inference, llm-inference-batching-scheduler</td></tr>
+        <tr><td>其他</td><td>~6</td><td>sparql-university, video-processing, etc.</td></tr>
+    </table>
+</div>
+
+<h3>典型任务解剖：qemu-startup（system-administration）</h3>
+
+<div class="card card-tinted-purple">
+    <h4>🎯 任务目标</h4>
+    <p>Agent 必须在 QEMU 中启动 <code>/app/alpine.iso</code>，暴露 telnet 串口控制台到 <code>127.0.0.1:6665</code>，后台运行 VM，并阻塞直到就绪。</p>
+
+    <h4>📦 任务配置（task.toml）</h4>
+<pre>[task]
+name = <span class="string">"qemu-startup"</span>
+authors = [<span class="string">"..."</span>]
+keywords = [<span class="string">"qemu"</span>, <span class="string">"vm"</span>, <span class="string">"alpine"</span>, <span class="string">"telnet"</span>]
+
+[metadata]
+category = <span class="string">"system-administration"</span>
+difficulty = <span class="string">"medium"</span>
+
+[agent]
+timeout_sec = 900
+
+[verifier]
+timeout_sec = 900
+
+[environment]
+cpus = 1
+memory_mb = 4096
+storage_mb = 10240
+allow_internet = <span class="keyword">true</span>
+
+[environment.docker]
+dockerfile = <span class="string">"environment/Dockerfile"</span></pre>
+
+    <h4>🐳 环境 Dockerfile（精简版）</h4>
+<pre>FROM ubuntu:22.04
+RUN apt-get update && apt-get install -y \
+    qemu-system-x86 qemu-utils telnet netcat-openbsd \
+    expect tmux curl
+<span class="comment"># 下载 Alpine 3.19 ISO</span>
+RUN curl -L -o /app/alpine.iso \
+    https://dl-cdn.alpinelinux.org/alpine/v3.19/releases/x86_64/alpine-virt-3.19.iso
+WORKDIR /app</pre>
+
+    <h4>✅ 验证测试（test.sh + test_outputs.py）</h4>
+<pre><span class="comment"># tests/test.sh</span>
+<span class="keyword">set</span> -e
+python3 /tests/test_outputs.py
+
+<span class="comment"># tests/test_outputs.py</span>
+import subprocess
+import time
+<span class="comment"># 用 expect 登录到 127.0.0.1:6665，运行 uname -r</span>
+result = subprocess.run([
+    <span class="string">'expect'</span>, <span class="string">'-c'</span>,
+    <span class="string">'''
+    set timeout 60
+    spawn telnet 127.0.0.1 6665
+    expect "#"
+    send "uname -r\r"
+    expect "#"
+    send "exit\r"
+    expect eof
+    '''</span>
+], capture_output=<span class="keyword">True</span>, text=<span class="keyword">True</span>)
+
+<span class="comment"># 验证输出包含 "6.6.4-1-lts"</span>
+assert <span class="string">"6.6.4-1-lts"</span> in result.stdout, f<span class="string">"Got: {result.stdout}"</span>
+print(<span class="string">"✓ QEMU Alpine kernel verified"</span>)</pre>
+
+    <p style="margin-top:0.8rem; padding:0.6rem; background:var(--primary-light); border-radius:6px; font-size:0.9rem;">
+        <strong>评测精髓：</strong>Agent 不知道要启动哪个 ISO、暴露哪个端口、阻塞方式 — 所有这些细节都需要自己从 instruction + 环境推断。
+    </p>
+</div>
     <div class="task-grid">
         <div class="task-item">adaptive-rejection-sampler</div>
         <div class="task-item hard">bn-fit-modify</div>
@@ -558,6 +690,15 @@ harbor run --dataset terminal-bench@2.0 \
 <h3>📈 论文实验数据：32,155 次实验</h3>
 
 <p>论文报告了 <strong>6 个 Agent + 16 个模型 + 89 任务 × 至少 5 次 = 32,155 个 trial</strong> 的完整结果。</p>
+
+<div class="note note-info">
+    <strong>📌 v2.0 vs v2.1 分数不可直接比较</strong>
+    <p>Codex 调研指出 v2.0 和 v2.1 的分数不可互换，因为 28 个任务发生了变化。v2.1 官方报告代表增益如：</p>
+    <ul>
+        <li><strong>GPT-5.3-Codex + Codex CLI</strong>：v2.0 = 73.3% → v2.1 = <strong>79.1%</strong>（+5.8pp）</li>
+    </ul>
+    <p>读 leaderboard 时务必确认是 v2.0 还是 v2.1。</p>
+</div>
 
 <h3>Top 10 模型（最佳 Agent 组合）</h3>
 
@@ -866,20 +1007,47 @@ docker run --rm my-test pytest tests/test_outputs.py -v</pre>
 <h3>✨ 合成任务的最佳实践</h3>
 
 <div class="note note-purple">
-    <strong>🎓 从 Terminal-Bench 论文总结的 7 条经验</strong>
+    <strong>🎓 从 Terminal-Bench 论文 + Harbor 文档总结的 7 条经验</strong>
     <ol>
         <li><strong>Specificity（明确性）</strong>：题面必须穷举所有"可接受终态"，测试必须覆盖所有这些终态</li>
-        <li><strong>Solvability（可解性）</strong>：solution.sh 必须跑通所有测试（验证题目本身可做）</li>
-        <li><strong>Integrity（完整性）</strong>：<strong>防作弊</strong> — 删掉 git 历史未来 commit、隐藏 oracle 文件位置</li>
+        <li><strong>Solvability（可解性）</strong>：solution/solve.sh 必须跑通所有测试（验证题目本身可做）</li>
+        <li><strong>Integrity（完整性）</strong>：<strong>防作弊</strong> — 删 git 历史未来 commit、隐藏 oracle 文件位置、禁上传 tests/、禁改 timeout</li>
         <li><strong>Dummy solution 必须失败</strong>：跑一个 no-op agent，确保它通过率 ≈ 0（否则题目太简单）</li>
         <li><strong>时间限制合理</strong>：专家 1-8 小时最合适（太长 = 评测不切实际）</li>
         <li><strong>难度评估要做</strong>：作者主观难度（medium/hard）+ 经验难度（实际跑模型）双标注</li>
-        <li><strong>Adversarial Exploit Audit</strong>：用一个"找漏洞 Agent"主动尝试作弊</li>
+        <li><strong>Adversarial Exploit Audit</strong>：用一个"找漏洞 Agent"主动尝试作弊（如 ForgeCode 拉网络答案案例）</li>
+        <li><strong>依赖与资源要稳</strong>：<code>allow_internet = true</code> 带来 drift 风险；指定具体 Alpine ISO 版本（如 3.19）避免漂移</li>
     </ol>
 </div>
 
 <!-- ==================== 10. 错误分析 ==================== -->
 <h2 id="errors">10. 错误分析：模型在哪里失败？</h2>
+
+<h3>🔁 Agent 交互循环详解</h3>
+
+<div class="card card-tinted-primary">
+    <h4>Harbor Agent Loop（Generic）</h4>
+    <p>Harbor 抽象出的 agent 接口：<code>run(instruction, environment, context)</code>，Agent 接收任务文本，通过 <code>BaseEnvironment</code> 操作容器。</p>
+
+    <h4>已安装 Agent（如 Claude Code / Codex CLI）</h4>
+    <p>直接装在容器内部，Agent 与 shell 命令在同一环境。</p>
+
+    <h4>外部 Agent 调用容器</h4>
+    <p>Agent 进程在主机，通过 <code>BaseEnvironment</code> 的 RPC 调容器内的 shell。</p>
+
+    <h4>Terminus 2（论文 §3.1 / Appendix F 的中性参考 scaffold）</h4>
+    <ul>
+        <li><strong>单一工具</strong>：headless terminal（无文件编辑快捷方式、无 Web 工具）</li>
+        <li><strong>工作方式</strong>：模型发出按键 + Bash 命令，<strong>通过 tmux-backed 终端</strong>发送，捕获终端输出返回给模型</li>
+        <li><strong>作用</strong>：作为"中性测试台"，公平比较不同模型（不偏向任何 Agent 框架）</li>
+    </ul>
+
+    <p style="margin-top:0.8rem; padding:0.6rem; background:var(--warning-light); border-radius:6px; font-size:0.9rem;">
+        <strong>关键点：</strong>论文强调"<em>despite the name, we do not explicitly require agents to use a terminal as their sole tool</em>"。
+        实际评测允许 Claude Code/Codex CLI 等带额外工具（文件编辑器、网络工具）的 Agent。
+        Terminus 2 只是一个<strong>公平比较基线</strong>，真实场景下 Claude Code/Codex CLI 表现更好。
+    </p>
+</div>
 
 <h3>📊 失败模式分类（论文 Section 4.4）</h3>
 
