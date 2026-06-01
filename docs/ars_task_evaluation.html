@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ARS 任务评测机制详解 | Terminal-Bench</title>
+    <style>
+        :root {
+            --primary: #1a73e8;
+            --primary-dark: #1557b0;
+            --primary-light: #e8f0fe;
+            --secondary: #34a853;
+            --secondary-light: #e8f5e9;
+            --accent: #ea4335;
+            --accent-light: #fce8e6;
+            --warning: #fbbc04;
+            --warning-light: #fef7e0;
+            --purple: #9334e6;
+            --purple-light: #f3e8fd;
+            --bg: #f8f9fa;
+            --card-bg: #ffffff;
+            --text: #202124;
+            --text-secondary: #5f6368;
+            --border: #e8eaed;
+            --code-bg: #f1f3f4;
+            --code-text: #174ea6;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans SC', 'PingFang SC', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.75;
+            padding: 2rem;
+        }
+        .container { max-width: 1100px; margin: 0 auto; }
+        h1 { font-size: 2.2rem; margin-bottom: 0.5rem; color: var(--primary-dark); }
+        h2 { font-size: 1.55rem; margin: 2.5rem 0 1rem; padding: 0.6rem 0 0.6rem 1rem; background: linear-gradient(90deg, var(--primary-light), transparent); border-left: 5px solid var(--primary); color: var(--primary-dark); }
+        h3 { font-size: 1.2rem; margin: 1.5rem 0 0.7rem; color: var(--text); padding-bottom: 0.3rem; border-bottom: 1px solid var(--border); }
+        p { margin: 0.6rem 0; }
+        .subtitle { color: var(--text-secondary); font-size: 1rem; margin-bottom: 1.5rem; }
+        .card { background: var(--card-bg); border-radius: 12px; padding: 1.4rem; margin-bottom: 1.3rem; box-shadow: 0 1px 3px rgba(0,0,0,0.08); border: 1px solid var(--border); }
+        .card-primary { border-left: 5px solid var(--primary); }
+        .card-secondary { border-left: 5px solid var(--secondary); }
+        .card-warning { border-left: 5px solid var(--warning); }
+        .card-accent { border-left: 5px solid var(--accent); }
+        .card-purple { border-left: 5px solid var(--purple); }
+        pre { background: #1e1e1e; color: #d4d4d4; padding: 1rem 1.3rem; border-radius: 8px; overflow-x: auto; margin: 0.8rem 0; font-size: 0.83rem; line-height: 1.55; font-family: 'SF Mono', Menlo, Consolas, monospace; }
+        pre .comment { color: #6a9955; }
+        pre .keyword { color: #c586c0; }
+        pre .string { color: #ce9178; }
+        pre .function { color: #dcdcaa; }
+        pre .number { color: #b5cea8; }
+        pre .builtin { color: #569cd6; }
+        code { background: var(--code-bg); color: var(--code-text); padding: 2px 6px; border-radius: 4px; font-size: 0.85em; font-family: 'SF Mono', Menlo, Consolas, monospace; }
+        .note { margin: 1rem 0; padding: 0.8rem 1rem; border-radius: 8px; font-size: 0.92rem; }
+        .note-tip { background: var(--secondary-light); border-left: 4px solid var(--secondary); }
+        .note-warning { background: var(--warning-light); border-left: 4px solid var(--warning); }
+        .note-info { background: var(--primary-light); border-left: 4px solid var(--primary); }
+        .note-danger { background: var(--accent-light); border-left: 4px solid var(--accent); }
+        .note-purple { background: var(--purple-light); border-left: 4px solid var(--purple); }
+        .note strong { display: block; margin-bottom: 0.3rem; }
+        .analogy { background: linear-gradient(135deg, #fff3e0, #ffffff); border-radius: 12px; padding: 1.2rem 1.4rem; margin: 1.2rem 0; border: 1px dashed var(--warning); }
+        .analogy h4 { color: #b06000; margin-bottom: 0.5rem; }
+        table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.9rem; }
+        th { background: var(--primary); color: white; padding: 0.6rem 0.8rem; text-align: left; font-weight: 500; }
+        td { padding: 0.5rem 0.8rem; border-bottom: 1px solid var(--border); vertical-align: top; }
+        tr:nth-child(even) { background: #fafbfc; }
+        .flow { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; margin: 1.2rem 0; }
+        .flow-box { background: var(--card-bg); border: 2px solid var(--primary); border-radius: 8px; padding: 0.6rem 0.9rem; font-size: 0.85rem; font-weight: 500; }
+        .flow-arrow { color: var(--primary); font-size: 1.3rem; font-weight: 700; }
+        .test-pill { display: inline-block; padding: 4px 12px; background: var(--primary-light); color: var(--primary-dark); border-radius: 16px; font-size: 0.82rem; font-weight: 600; margin: 2px; }
+        .test-pill-pass { background: var(--secondary-light); color: #1b5e20; }
+        .test-pill-fail { background: var(--accent-light); color: var(--accent); }
+        ul, ol { margin: 0.5rem 0 0.5rem 1.5rem; }
+        li { padding: 0.2rem 0; }
+    </style>
+</head>
+<body>
+<div class="container">
+
+<h1>🧪 ARS 任务的评测机制详解</h1>
+<p class="subtitle">如何用 4 个测试函数"判刑" Agent 写的 R 代码？| Terminal-Bench adaptive-rejection-sampler 深度解析</p>
+
+<div class="analogy">
+    <h4>🎯 一句话回答</h4>
+    <p><strong>不是"判输出准不准"，而是"分 4 关卡"逐步验证：</strong></p>
+    <ol>
+        <li>📁 <strong>文件存在关</strong>：你写了文件吗？函数名对吗？</li>
+        <li>🔬 <strong>能跑关</strong>：你写的 R 函数能跑出 1000 个数吗？</li>
+        <li>📊 <strong>分布形状关</strong>：这些数的均值和标准差是不是 ≈ 标准正态？</li>
+        <li>📝 <strong>输出格式关</strong>：你写的 test 函数输出符合 <code>TEST_NAME: PASS</code> 格式吗？</li>
+    </ol>
+    <p><strong>4 关全过 = 通过；任一关失败 = 失败。</strong>不是单一指标，是"组合拳"。</p>
+</div>
+
+<!-- ==================== 评测总览 ==================== -->
+<h2>📊 评测流程总览</h2>
+
+<div class="flow">
+    <div class="flow-box">1. Agent 完成任务</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box">2. test.sh 启动</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box">3. 4 个 pytest 串行执行</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box">4. 写入 reward.txt</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box">5. Harbor 读取</div>
+</div>
+
+<div class="card card-primary">
+    <h3>🛠️ 真实评测入口（test.sh）</h3>
+<pre><span class="comment">#!/bin/bash</span>
+<span class="comment"># 1. 安装测试需要的 Python 环境</span>
+apt-get update
+apt-get install -y curl
+curl -LsSf https://astral.sh/uv/0.9.5/install.sh | sh
+source $HOME/.local/bin/env
+
+<span class="comment"># 2. 跑 pytest 跑全部测试</span>
+uvx -p 3.13 \
+  -w pytest==8.4.1 \
+  -w numpy==2.3.3 \
+  -w scipy==1.16.2 \
+  pytest --ctrf /logs/verifier/ctrf.json /tests/test_outputs.py -rA
+
+<span class="comment"># 3. 根据 pytest 退出码写 reward</span>
+<span class="keyword">if</span> [ $? -eq 0 ]; <span class="keyword">then</span>
+  <span class="function">echo</span> 1 > /logs/verifier/reward.txt    <span class="comment"># 通过 = 1</span>
+<span class="keyword">else</span>
+  <span class="function">echo</span> 0 > /logs/verifier/reward.txt    <span class="comment"># 失败 = 0</span>
+<span class="keyword">fi</span></pre>
+    <p style="margin-top:0.5rem;"><strong>关键设计：</strong>reward 是 <strong>二值（0/1）</strong>，不是分数。4 个测试函数 <strong>必须全部通过</strong> 才算任务通过。</p>
+</div>
+
+<!-- ==================== 4 个测试函数详解 ==================== -->
+<h2>🔍 4 个测试函数逐个拆解</h2>
+
+<h3>测试 1️⃣：<code>test_ars_function_exists</code> — 文件存在性检查</h3>
+
+<div class="card card-secondary">
+    <h4>目的：确保 Agent 真的"交了作业"</h4>
+<pre><span class="keyword">def</span> <span class="function">test_ars_function_exists</span>():
+    app_dir = Path(<span class="string">"/app"</span>)
+    ars_file = app_dir / <span class="string">"ars.R"</span>                              <span class="comment"># 检查文件</span>
+    <span class="keyword">assert</span> ars_file.exists(), <span class="string">"No ars.R file found..."</span>
+
+    content = ars_file.read_text()
+    ars_pattern = <span class="string">r"ars\s*<-|ars\s*=\s*function"</span>             <span class="comment"># 正则匹配函数定义</span>
+    <span class="keyword">assert</span> re.search(ars_pattern, content), \
+        <span class="string">"No 'ars' function found in ars.R..."</span></pre>
+
+    <h4>通俗解释</h4>
+    <p>这关干的事非常"机械"，就是检查：</p>
+    <ul>
+        <li>✅ 文件 <code>/app/ars.R</code> 存在吗？</li>
+        <li>✅ 文件里有 <code>ars &lt;- function(...)</code> 或 <code>ars = function(...)</code> 这样的函数定义吗？</li>
+    </ul>
+    <p>用<strong>正则表达式</strong> <code>r"ars\s*<-|ars\s*=\s*function"</code> 容忍空格变化（<code>ars &lt;-</code> 或 <code>ars=</code> 都接受）。</p>
+
+    <div class="note note-tip">
+        <strong>💡 这关的意义</strong>
+        防止 Agent 走捷径：比如 Agent 可能在 README 里写"实现思路"但不写代码。
+        这关<strong>强制代码存在</strong>。
+    </div>
+</div>
+
+<h3>测试 2️⃣：<code>test_can_generate_standard_distribution_samples</code> — 功能性测试</h3>
+
+<div class="card card-primary">
+    <h4>目的：确保 Agent 的函数真的能跑、能输出样本</h4>
+<pre><span class="comment"># 关键步骤：写一个 R 测试脚本，扔到 /app 下，调用 Agent 写的 ars()</span>
+test_code_r = <span class="string">"""
+library(stats)
+source("ars.R")                            # 加载 Agent 写的代码
+
+normal_density &lt;- function(x) {
+    dnorm(x, mean = 0, sd = 1)             # 标准正态密度
+}
+
+tryCatch({
+    samples &lt;- ars(normal_density, c(-5, 5), n = 1000)  # 采 1000 个样本
+
+    # 三个条件同时满足才算 PASS
+    if (length(samples) >= 900                  # 1. 样本数够
+        && abs(mean(samples)) < 0.2             # 2. 均值 ≈ 0
+        && sd(samples) > 0.8 && sd(samples) < 1.2) {  # 3. 标准差 ≈ 1
+        cat("PASS: Generated valid normal samples\\n")
+    }
+}, error = function(e) {                       # 任何错误都 FAIL
+    cat("ERROR:", conditionMessage(e), "\\n")
+})
+"""</span>
+
+<span class="comment"># 跑这个 R 脚本，检查输出含 "PASS"</span>
+result = subprocess.run([<span class="string">"Rscript"</span>, str(test_file)], ...)
+output = result.stdout + result.stderr
+<span class="keyword">assert</span> <span class="string">"PASS"</span> <span class="keyword">in</span> output, <span class="string">f"Failed to generate... Output: {output}"</span></pre>
+
+    <h4>通俗解释（"出题"思路）</h4>
+    <div class="analogy">
+        <h4>📚 像老师判作业</h4>
+        <p>老师把学生写的函数 <code>ars()</code> 包装在一个"标准测试"里：</p>
+        <ol>
+            <li>喂一个标准正态密度 <code>dnorm</code></li>
+            <li>让 <code>ars()</code> 采 1000 个样本</li>
+            <li>看采出来的 1000 个数：</li>
+        </ol>
+<pre>  样本数 ≥ 900 个？                    ← 学生至少得跑出 1000 个数
+  均值的绝对值 &lt; 0.2？                 ← 真的从"中间"采的
+  标准差在 0.8 ~ 1.2 之间？             ← 真的从"标准正态"采的，不是均匀也不是夸张</pre>
+        <p><strong>全满足 → PASS；任一不满足 → FAIL</strong>（如 Agent 函数 <code>stop()</code> 抛错，<code>tryCatch</code> 捕获后输出 ERROR）。</p>
+    </div>
+
+    <h4>关键数字的含义（误差容忍度）</h4>
+    <table>
+        <tr><th>条件</th><th>阈值</th><th>为什么？</th></tr>
+        <tr><td><code>length(samples) ≥ 900</code></td><td>至少 900/1000 = 90%</td><td>允许 Agent 在采样过程中少量失败（如 log-concavity 检查不过）</td></tr>
+        <tr><td><code>|mean| &lt; 0.2</code></td><td>均值偏离真值 ≤ 0.2</td><td>标准正态均值 = 0，1000 样本的标准误 = 1/√1000 ≈ 0.032，0.2 是 6.2σ（极宽松）</td></tr>
+        <tr><td><code>0.8 &lt; sd &lt; 1.2</code></td><td>标准差偏离 ≤ 20%</td><td>标准正态 sd = 1，宽松容忍</td></tr>
+    </table>
+
+    <div class="note note-warning">
+        <strong>⚠️ 统计容忍度设计</strong>
+        <p>因为采样是<strong>随机过程</strong>，如果阈值太严（如 <code>|mean| &lt; 0.05</code>），可能 Agent 写对了代码但被"运气差"判错。0.2 / 0.2 的阈值是统计合理 + 实际可判错的平衡点。</p>
+    </div>
+</div>
+
+<h3>测试 3️⃣：<code>test_has_test_function</code> — 函数存在性检查</h3>
+
+<div class="card card-secondary">
+    <h4>目的：检查 Agent 是否写了 <code>test()</code> 函数</h4>
+<pre><span class="keyword">def</span> <span class="function">test_has_test_function</span>():
+    r_files = list(Path(<span class="string">"/app"</span>).glob(<span class="string">"*.R"</span>))         <span class="comment"># 找所有 .R 文件</span>
+    test_found = <span class="keyword">False</span>
+
+    <span class="keyword">for</span> r_file <span class="keyword">in</span> r_files:
+        content = r_file.read_text()
+        test_pattern = <span class="string">r"test\s*<-|test\s*=\s*function"</span>  <span class="comment"># 同理正则</span>
+        <span class="keyword">if</span> re.search(test_pattern, content):
+            test_found = <span class="keyword">True</span>
+            <span class="keyword">break</span>
+
+    <span class="keyword">assert</span> test_found, <span class="string">"No 'test' function found..."</span></pre>
+
+    <h4>通俗解释</h4>
+    <p>题面要求 Agent <strong>自己写一个 <code>test()</code> 函数</strong>做正式测试。这关就是检查：</p>
+    <ul>
+        <li>扫 <code>/app/*.R</code> 所有文件</li>
+        <li>看有没有 <code>test &lt;- function(...)</code> 这种定义</li>
+    </ul>
+
+    <div class="note note-info">
+        <strong>💡 为什么要求 Agent 写 test 函数？</strong>
+        <p>题面原文："<em>Formal testing is required... with a set of tests where results are compared to some known truth.</em>"</p>
+        <p><strong>评测 Agent 的元能力</strong>：不光要会实现，还要会<strong>自我验证</strong>。这与 Terminal-Bench 失败模式分类中的 "Verification" 维度直接对应。</p>
+    </div>
+</div>
+
+<h3>测试 4️⃣：<code>test_formal_testing_with_known_truth</code> — 行为正确性测试</h3>
+
+<div class="card card-warning">
+    <h4>目的：跑 Agent 写的 <code>test()</code> 函数，检查输出格式</h4>
+<pre><span class="comment"># 写脚本：source Agent 的代码，调用它写的 test()</span>
+test_code = <span class="string">"""
+source("ars.R")
+if (exists("test")) {
+    test()                                # 直接调用
+} else {
+    cat("ERROR: test function not found\\n")
+}
+"""</span>
+
+result = subprocess.run([<span class="string">"Rscript"</span>, str(test_file)], ...)
+output = result.stdout + result.stderr
+
+<span class="comment"># 检查 1：输出必须含 ": PASS" 或 ": FAIL"</span>
+<span class="keyword">assert</span> <span class="string">": PASS"</span> <span class="keyword">in</span> output <span class="keyword">or</span> <span class="string">": FAIL"</span> <span class="keyword">in</span> output, \
+    <span class="string">"Test function must output results in format 'TEST_NAME: PASS' or 'TEST_NAME: FAIL'"</span>
+
+<span class="comment"># 检查 2：必须含 "mean" 统计信息</span>
+<span class="keyword">assert</span> <span class="string">"mean"</span> <span class="keyword">in</span> output.lower(), \
+    <span class="string">"Test output should include mean statistics"</span></pre>
+
+    <h4>通俗解释（最严格的一关）</h4>
+    <div class="analogy">
+        <h4>📚 像老师让学生自评</h4>
+        <p>老师："你不是说会写测试吗？我现在跑你的测试函数，看它输出对不对。"</p>
+        <ol>
+            <li>把 Agent 写的 <code>ars.R</code> 加载进来</li>
+            <li>调用 <code>test()</code>（让 Agent 自我验证自己的实现）</li>
+            <li><strong>检查输出格式：</strong></li>
+        </ol>
+        <p style="margin:0.5rem 0;"><strong>必须包含的格式（题面要求）：</strong></p>
+<pre>  TEST_NAME: PASS              ← 通过的测试
+  或
+  TEST_NAME: FAIL              ← 失败的测试
+  Mean: 0.0123 (expected: 0.0) ← 统计量输出
+  SD: 0.9987 (expected: 1.0)</pre>
+        <p>这两条断言任意一条不满足 = FAIL。</p>
+    </div>
+
+    <h4>为什么"检查输出格式"也算"准确"？</h4>
+    <p>题面明确规定：</p>
+    <blockquote style="margin:0.5rem 0; padding:0.5rem 1rem; border-left:4px solid var(--border); color:var(--text-secondary); font-style:italic;">
+        "Your test function should output results in the format: 'TEST_NAME: PASS' or 'TEST_NAME: FAIL' with mean and standard deviation statistics"
+    </blockquote>
+    <p>这是题面要求 Agent <strong>必须满足的契约</strong>，所以测试函数检查"是否遵守契约"是合理的。</p>
+
+    <div class="note note-warning">
+        <strong>⚠️ 这关的微妙之处</strong>
+        <p>测试 4 不要求 Agent 写的 test() 函数"判定结果对"，只要求它"按格式输出"。</p>
+        <p>例如：Agent 写 <code>cat("AnyTest: PASS")</code> 也能过这关！</p>
+        <p><strong>真正判定 ARS 准确性的是测试 2</strong>，测试 4 只是检查"自我报告格式"。</p>
+    </div>
+</div>
+
+<!-- ==================== 4 关系 ==================== -->
+<h2>🎯 4 个测试的协同关系</h2>
+
+<div class="card card-purple">
+    <h3>📐 评测设计的层次结构</h3>
+    <table>
+        <tr><th>测试</th><th>检查维度</th><th>类型</th><th>失败意味</th></tr>
+        <tr>
+            <td><span class="test-pill">测试 1</span></td>
+            <td>代码是否存在</td>
+            <td>结构性</td>
+            <td>Agent 偷懒没写代码</td>
+        </tr>
+        <tr>
+            <td><span class="test-pill">测试 2</span></td>
+            <td>采样功能正确</td>
+            <td>功能性（核心）</td>
+            <td>Agent 算法写错了 / 没真实现</td>
+        </tr>
+        <tr>
+            <td><span class="test-pill">测试 3</span></td>
+            <td>test 函数存在</td>
+            <td>结构性</td>
+            <td>Agent 没写自检函数</td>
+        </tr>
+        <tr>
+            <td><span class="test-pill">测试 4</span></td>
+            <td>自检输出格式</td>
+            <td>契约性</td>
+            <td>Agent 不遵守输出约定</td>
+        </tr>
+    </table>
+
+    <h3>为什么需要 4 个而不是 1 个？</h3>
+    <div class="note note-purple">
+        <strong>🎓 设计哲学：分层验证，捕捉不同作弊模式</strong>
+        <ol>
+            <li><strong>测试 1 防"没交作业"</strong>：不写代码就提交</li>
+            <li><strong>测试 2 防"写错代码"</strong>：这是最关键的功能性检查</li>
+            <li><strong>测试 3 防"不写测试"</strong>：逃避自验证要求</li>
+            <li><strong>测试 4 防"瞎写测试"</strong>：测试函数只是装饰品</li>
+        </ol>
+        <p>这对应了 Terminal-Bench 论文中的 <strong>"specificity（明确性）"</strong> 原则：测试必须捕获所有正确终态。</p>
+    </div>
+</div>
+
+<!-- ==================== 真实通过/失败样例 ==================== -->
+<h2>📋 真实运行样例（如果 Agent 写得对）</h2>
+
+<h3>✅ 全部 4 个测试通过时</h3>
+
+<pre><span class="comment"># Harbor 运行后，/logs/verifier/reward.txt 内容：</span>
+1
+
+<span class="comment"># pytest 输出（节选）：</span>
+tests/test_outputs.py::test_ars_function_exists                    PASSED
+tests/test_outputs.py::test_can_generate_standard_distribution_samples  PASSED
+tests/test_outputs.py::test_has_test_function                     PASSED
+tests/test_outputs.py::test_formal_testing_with_known_truth       PASSED
+
+<span class="comment"># 1 passed in 0.07s   ← 其实是 4 passed</span></pre>
+
+<h3>❌ 典型失败场景</h3>
+
+<div class="card card-accent">
+    <h4>场景 A：Agent 实现了 ars 但写的是常数（<code>rep(0.5, n)</code>）</h4>
+    <p><strong>测试 1</strong> ✅ 通过（文件 + 函数都在）</p>
+    <p><strong>测试 2</strong> ❌ 失败（<code>sd(samples) ≈ 0</code>，不满足 0.8 &lt; sd &lt; 1.2）</p>
+<pre>AssertionError: Failed to generate valid normal samples.
+Output: ERROR: Mean or std out of range</pre>
+    <p><strong>启示：</strong>Agent 想"骗过"测试 1 容易，骗过测试 2 难。</p>
+</div>
+
+<div class="card card-accent">
+    <h4>场景 B：Agent 写对了 ars 但没写 test 函数</h4>
+    <p><strong>测试 1</strong> ✅ 通过</p>
+    <p><strong>测试 2</strong> ✅ 通过（真采样正常）</p>
+    <p><strong>测试 3</strong> ❌ 失败（找不到 <code>test &lt;- function</code> 定义）</p>
+<pre>AssertionError: No 'test' function found.
+Task requires a function named 'test' that carries out
+formal testing of the implementation.</pre>
+    <p><strong>启示：</strong>只实现功能还不够，必须满足所有契约。</p>
+</div>
+
+<div class="card card-accent">
+    <h4>场景 C：Agent 写了 test 但输出格式不对</h4>
+    <p><strong>测试 1-3</strong> ✅ 通过</p>
+    <p><strong>测试 4</strong> ❌ 失败（输出 "All tests passed" 而不是 "TEST_NAME: PASS"）</p>
+<pre>AssertionError: Test function must output results in format
+'TEST_NAME: PASS' or 'TEST_NAME: FAIL'</pre>
+    <p><strong>启示：</strong>test 函数必须按<strong>规定的格式字符串</strong>输出，不能自由发挥。</p>
+</div>
+
+<!-- ==================== 总结 ==================== -->
+<h2>🎓 核心要点总结</h2>
+
+<div class="card card-primary">
+    <h3>评测 ARS 任务的 5 个关键点</h3>
+    <ol>
+        <li>
+            <strong>评测的是"组合契约"，不是单一指标</strong><br>
+            4 个测试函数分别检查不同维度，<strong>全部通过</strong>才给 reward=1
+        </li>
+        <li>
+            <strong>功能性测试（测试 2）是核心</strong><br>
+            它真的运行 R 代码并验证统计量（mean ≈ 0，sd ≈ 1），这是最"硬"的检查
+        </li>
+        <li>
+            <strong>用 tryCatch 捕获错误</strong><br>
+            R 函数抛错不算"未通过"，会变成 ERROR 输出，被 Python 端判断为 FAIL
+        </li>
+        <li>
+            <strong>统计容忍度（0.2 / 20%）是合理设计</strong><br>
+            太严会被"运气差"误判，太松会放过真 bug
+        </li>
+        <li>
+            <strong>reward 是二值（0 或 1）</strong><br>
+            通过 = 1，失败 = 0。Harbor 只看这个数字，pytest 退出码决定
+        </li>
+    </ol>
+</div>
+
+<div style="margin-top:2rem; padding:1.2rem; background:var(--primary-light); border-radius:8px;">
+    <h3 style="margin-top:0;">🔗 与 Terminal-Bench 设计哲学的关联</h3>
+    <p style="margin:0.5rem 0;">ARS 任务的测试设计完美体现了 Terminal-Bench 论文中提到的三大质量标准：</p>
+    <ul style="margin-top:0.5rem;">
+        <li><strong>Specificity（明确性）</strong>：4 个测试覆盖了"代码存在 / 功能正确 / test 函数存在 / 格式正确" 4 个明确维度</li>
+        <li><strong>Solvability（可解性）</strong>：solution/solve.sh 给出了完整参考实现，证明任务可解</li>
+        <li><strong>Integrity（完整性）</strong>：Oracle solution 加密在 <code>protected.tar.gz.enc</code>，Agent 无法看到，避免作弊</li>
+    </ul>
+</div>
+
+</div>
+</body>
+</html>
