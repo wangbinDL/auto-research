@@ -1,0 +1,954 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Agent Benchmarks 2025-2026 | Auto Research</title>
+    <style>
+        :root {
+            --primary: #1a73e8;
+            --primary-dark: #1557b0;
+            --secondary: #34a853;
+            --accent: #ea4335;
+            --warning: #fbbc04;
+            --bg: #f8f9fa;
+            --card-bg: #ffffff;
+            --text: #202124;
+            --text-secondary: #5f6368;
+            --border: #e8eaed;
+            --code-bg: #f1f3f4;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans SC', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.7;
+            padding: 2rem;
+        }
+        .container { max-width: 1200px; margin: 0 auto; }
+        h1 { font-size: 2.2rem; margin-bottom: 0.5rem; color: var(--primary-dark); }
+        h2 { font-size: 1.6rem; margin: 2.5rem 0 1rem; padding-bottom: 0.5rem; border-bottom: 3px solid var(--primary); color: var(--primary-dark); }
+        h3 { font-size: 1.2rem; margin: 1.5rem 0 0.8rem; color: var(--text); }
+        .subtitle { color: var(--text-secondary); font-size: 1rem; margin-bottom: 2rem; }
+        .badge { display: inline-block; padding: 2px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+        .badge-new { background: #e8f5e9; color: #2e7d32; }
+        .badge-updated { background: #e3f2fd; color: #1565c0; }
+        .badge-hot { background: #fce4ec; color: #c62828; }
+        .badge-coding { background: #ede7f6; color: #4527a0; }
+        .badge-agent { background: #fff3e0; color: #e65100; }
+        .badge-reasoning { background: #e0f2f1; color: #00695c; }
+        .badge-finance { background: #fff8e1; color: #f57f17; }
+        .badge-kernel { background: #efebe9; color: #4e342e; }
+        .card { background: var(--card-bg); border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04); border: 1px solid var(--border); transition: box-shadow 0.2s; }
+        .card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .card-header { display: flex; align-items: center; gap: 0.8rem; margin-bottom: 0.8rem; flex-wrap: wrap; }
+        .card-header h3 { margin: 0; }
+        .score-table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.9rem; }
+        .score-table th { background: var(--primary); color: white; padding: 0.6rem 1rem; text-align: left; font-weight: 500; }
+        .score-table td { padding: 0.5rem 1rem; border-bottom: 1px solid var(--border); }
+        .score-table tr:nth-child(even) { background: var(--bg); }
+        .score-table tr:hover { background: #e8f0fe; }
+        .score-best { font-weight: 700; color: var(--secondary); }
+        .info-grid { display: grid; grid-template-columns: 140px 1fr; gap: 0.4rem 1rem; font-size: 0.9rem; }
+        .info-grid dt { font-weight: 600; color: var(--text-secondary); }
+        .info-grid dd { color: var(--text); }
+        .relevance { margin-top: 1rem; padding: 0.8rem 1rem; background: #e8f5e9; border-left: 4px solid var(--secondary); border-radius: 0 8px 8px 0; font-size: 0.9rem; }
+        .relevance strong { color: #2e7d32; }
+        .warning-box { margin-top: 1rem; padding: 0.8rem 1rem; background: #fff3e0; border-left: 4px solid var(--warning); border-radius: 0 8px 8px 0; font-size: 0.9rem; }
+        .comparison-table { width: 100%; border-collapse: collapse; margin: 1.5rem 0; font-size: 0.85rem; }
+        .comparison-table th { background: var(--primary-dark); color: white; padding: 0.7rem 0.5rem; text-align: center; font-weight: 500; white-space: nowrap; }
+        .comparison-table th:first-child { text-align: left; min-width: 140px; }
+        .comparison-table td { padding: 0.6rem 0.5rem; border-bottom: 1px solid var(--border); text-align: center; font-size: 0.82rem; }
+        .comparison-table td:first-child { text-align: left; font-weight: 500; }
+        .comparison-table tr:nth-child(even) { background: var(--bg); }
+        .best-score { background: #e8f5e9 !important; font-weight: 700; color: #2e7d32; }
+        .toc { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem; }
+        .toc h3 { margin-bottom: 0.8rem; font-size: 1rem; }
+        .toc ul { list-style: none; }
+        .toc li { padding: 0.3rem 0; }
+        .toc a { color: var(--primary); text-decoration: none; }
+        .toc a:hover { text-decoration: underline; }
+        .spectrum { display: flex; gap: 4px; margin: 1rem 0; flex-wrap: wrap; }
+        .spectrum-item { flex: 1; min-width: 120px; padding: 0.6rem; border-radius: 8px; text-align: center; font-size: 0.8rem; font-weight: 500; }
+        a { color: var(--primary); }
+        code { background: var(--code-bg); padding: 2px 6px; border-radius: 4px; font-size: 0.85em; }
+        @media (max-width: 768px) { body { padding: 1rem; } h1 { font-size: 1.6rem; } .info-grid { grid-template-columns: 1fr; } .comparison-table { font-size: 0.72rem; } }
+    </style>
+</head>
+<body>
+<div class="container">
+
+<h1>AI Agent Benchmarks 2025-2026</h1>
+<p class="subtitle">
+    Auto Research 项目评测集全景 | 最后更新: 2026-06-01 | CCG 三方调研 (Claude + Codex/GPT-5.5 + Gemini)
+</p>
+
+<div class="toc">
+    <h3>目录</h3>
+    <ul>
+        <li><a href="#overview">总览：模型横评对比表</a></li>
+        <li><a href="#spectrum">能力光谱：Benchmark 覆盖维度</a></li>
+        <li><a href="#swe-pro">1. SWE-Bench Pro — 专业级软件工程</a></li>
+        <li><a href="#terminal">2. Terminal-Bench 2.1 — 终端环境任务</a></li>
+        <li><a href="#hle">3. Humanity's Last Exam — 人类最后的考试</a></li>
+        <li><a href="#osworld">4. OSWorld-Verified — 操作系统自动化</a></li>
+        <li><a href="#gdpval">5. GDPval-AA — 经济工作价值评估</a></li>
+        <li><a href="#finance">6. Finance Agent v2 — 金融 Agent 推理</a></li>
+        <li><a href="#swe-fficiency">7. SWE-fficiency — 代码性能优化</a></li>
+        <li><a href="#kernel">8. KernelBench Hard — GPU Kernel 优化</a></li>
+        <li><a href="#mcp">9. MCP Atlas — MCP 工具使用能力</a></li>
+        <li><a href="#others">10. 其他重要新 Benchmark</a></li>
+        <li><a href="#our-system">与 Auto Research 系统的关联</a></li>
+    </ul>
+</div>
+
+<!-- ==================== 总览 ==================== -->
+<h2 id="overview">总览：2026 模型横评对比表</h2>
+
+<p>数据综合自 Anthropic Opus 4.8 System Card、MiniMax M3 博客、各 Benchmark 官方 Leaderboard 及 Codex/GPT-5.5 联网调研（2026-06-01）。</p>
+
+<table class="comparison-table">
+    <thead>
+        <tr>
+            <th>Benchmark</th>
+            <th>维度</th>
+            <th>Opus 4.8</th>
+            <th>GPT-5.5</th>
+            <th>Gemini 3.5 Flash</th>
+            <th>Gemini 3.1 Pro</th>
+            <th>MiniMax M3</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>SWE-Bench Pro</td>
+            <td><span class="badge badge-coding">Coding</span></td>
+            <td class="best-score">69.2%</td>
+            <td>58.6%</td>
+            <td>—</td>
+            <td>54.2%</td>
+            <td>59.0%</td>
+        </tr>
+        <tr>
+            <td>Terminal-Bench 2.1</td>
+            <td><span class="badge badge-coding">Terminal</span></td>
+            <td>78.9%<br><small>(Claude Code)</small></td>
+            <td class="best-score">83.4%<br><small>(Codex CLI)</small></td>
+            <td>76.2%</td>
+            <td>70.3%</td>
+            <td>66.0%</td>
+        </tr>
+        <tr>
+            <td>HLE (no tools)</td>
+            <td><span class="badge badge-reasoning">Reasoning</span></td>
+            <td class="best-score">49.8%</td>
+            <td>41.4%</td>
+            <td>—</td>
+            <td>44.4%</td>
+            <td>—</td>
+        </tr>
+        <tr>
+            <td>HLE (with tools)</td>
+            <td><span class="badge badge-reasoning">Reasoning</span></td>
+            <td class="best-score">57.9%</td>
+            <td>52.2%</td>
+            <td>—</td>
+            <td>51.4%</td>
+            <td>—</td>
+        </tr>
+        <tr>
+            <td>OSWorld-Verified</td>
+            <td><span class="badge badge-agent">Agent</span></td>
+            <td class="best-score">83.4%</td>
+            <td>78.7%</td>
+            <td>78.4%</td>
+            <td>—</td>
+            <td>70.1%</td>
+        </tr>
+        <tr>
+            <td>GDPval-AA (Elo)</td>
+            <td><span class="badge badge-reasoning">Knowledge</span></td>
+            <td class="best-score">1890</td>
+            <td>1769</td>
+            <td>1656</td>
+            <td>1314</td>
+            <td>—</td>
+        </tr>
+        <tr>
+            <td>Finance Agent v2</td>
+            <td><span class="badge badge-finance">Finance</span></td>
+            <td>53.92%</td>
+            <td>51.76%</td>
+            <td class="best-score">57.86%</td>
+            <td>—</td>
+            <td>—</td>
+        </tr>
+        <tr>
+            <td>SWE-fficiency</td>
+            <td><span class="badge badge-coding">Efficiency</span></td>
+            <td>—</td>
+            <td>—</td>
+            <td>—</td>
+            <td>—</td>
+            <td>34.8%</td>
+        </tr>
+        <tr>
+            <td>KernelBench Hard</td>
+            <td><span class="badge badge-kernel">Kernel</span></td>
+            <td class="best-score">7/7</td>
+            <td>6/7</td>
+            <td>5/7</td>
+            <td>—</td>
+            <td>28.8%*</td>
+        </tr>
+        <tr>
+            <td>MCP Atlas</td>
+            <td><span class="badge badge-agent">Tool Use</span></td>
+            <td>82.2%</td>
+            <td>75.3%</td>
+            <td class="best-score">83.6%</td>
+            <td>78.2%</td>
+            <td>74.2%</td>
+        </tr>
+    </tbody>
+</table>
+<p style="font-size:0.8rem; color:var(--text-secondary);">
+    Terminal-Bench 分数与 harness/scaffold 强相关，不同 harness 分数不直接可比。<br>
+    MiniMax M3 分数来自厂商公告，部分尚未被 Benchmark 官方 Leaderboard 确认。<br>
+    *MiniMax M3 KernelBench Hard 28.8% 可能使用旧版/不同评分口径。
+</p>
+
+<!-- ==================== 能力光谱 ==================== -->
+<h2 id="spectrum">能力光谱：Benchmark 覆盖维度</h2>
+
+<div class="spectrum">
+    <div class="spectrum-item" style="background:#ede7f6;">
+        <strong>代码工程</strong><br>
+        SWE-Bench Pro<br>SWE-fficiency
+    </div>
+    <div class="spectrum-item" style="background:#e3f2fd;">
+        <strong>终端/系统</strong><br>
+        Terminal-Bench 2.1<br>OSWorld-Verified
+    </div>
+    <div class="spectrum-item" style="background:#e0f2f1;">
+        <strong>推理/知识</strong><br>
+        HLE<br>GDPval-AA
+    </div>
+    <div class="spectrum-item" style="background:#fff3e0;">
+        <strong>Agent/工具</strong><br>
+        MCP Atlas<br>Finance Agent v2
+    </div>
+    <div class="spectrum-item" style="background:#efebe9;">
+        <strong>底层优化</strong><br>
+        KernelBench Hard
+    </div>
+</div>
+
+<!-- ==================== 1. SWE-Bench Pro ==================== -->
+<h2 id="swe-pro">1. SWE-Bench Pro</h2>
+
+<div class="card">
+    <div class="card-header">
+        <h3>专业级长程软件工程 Agent 评测</h3>
+        <span class="badge badge-new">2025-09</span>
+        <span class="badge badge-coding">Coding</span>
+    </div>
+
+    <dl class="info-grid">
+        <dt>全称</dt>
+        <dd>SWE-Bench Pro: Can AI Agents Solve Long-Horizon Software Engineering Tasks?</dd>
+        <dt>创建者</dt>
+        <dd><strong>Scale AI / Scale Research</strong></dd>
+        <dt>发布日期</dt>
+        <dd>arXiv 2025-09-21，修订 2025-11-14</dd>
+        <dt>论文链接</dt>
+        <dd><a href="https://arxiv.org/abs/2509.16941" target="_blank">arXiv:2509.16941</a> | <a href="https://scaleapi.github.io/SWE-bench_Pro-os/" target="_blank">官方页面</a></dd>
+        <dt>评测能力</dt>
+        <dd>长程软件工程：阅读代码库、理解需求、多文件编辑、通过隐藏测试</dd>
+        <dt>数据规模</dt>
+        <dd><strong>1,865 个问题</strong>，来自 41 个活跃维护的仓库（商业应用、B2B 服务、开发工具）</dd>
+        <dt>评分方式</dt>
+        <dd>Resolved Rate / pass@1 — patch 能否通过 benchmark harness 的完整测试</dd>
+        <dt>Patch 特征</dt>
+        <dd>平均 <strong>107.4 LOC</strong>，横跨 <strong>4.1 个文件</strong>，排除 1-10 行的琐碎修改</dd>
+    </dl>
+
+    <h3 style="margin-top:1rem;">与前代版本对比</h3>
+    <table class="score-table">
+        <tr><th>版本</th><th>创建者</th><th>任务数</th><th>定位</th><th>特点</th></tr>
+        <tr><td>SWE-bench Full</td><td>Princeton NLP</td><td>2,294</td><td>大规模基线</td><td>GitHub Issue，含噪声</td></tr>
+        <tr><td>SWE-bench Lite</td><td>Princeton NLP</td><td>300</td><td>快速评估</td><td>精选子集</td></tr>
+        <tr><td>SWE-bench Verified</td><td>Princeton NLP</td><td>500</td><td>可信评估</td><td>人工验证可解性</td></tr>
+        <tr><td><strong>SWE-Bench Pro</strong></td><td><strong>Scale AI</strong></td><td><strong>1,865</strong></td><td><strong>专业评估</strong></td><td>更难、多文件、企业级、抗污染</td></tr>
+    </table>
+
+    <h3>模型成绩</h3>
+    <table class="score-table">
+        <tr><th>模型</th><th>分数</th></tr>
+        <tr><td class="score-best">Claude Opus 4.8</td><td class="score-best">69.2%</td></tr>
+        <tr><td>MiniMax M3</td><td>59.0%</td></tr>
+        <tr><td>GPT-5.5</td><td>58.6%</td></tr>
+        <tr><td>Gemini 3.1 Pro</td><td>54.2%</td></tr>
+    </table>
+
+    <div class="relevance">
+        <strong>与 Auto Research 的关联：</strong>
+        直接评估 Agent 的代码修改能力。我们的 Agent 需要跨多文件修改训练代码（配置、数据增强、模型架构），
+        SWE-Bench Pro 的"长程 + 多文件 + 企业级"特征与科研代码修改高度一致。
+        <strong>Opus 4.8 的 69.2% 领先第二名 10pp+</strong>，是当前最强代码 Agent 后端。
+    </div>
+</div>
+
+<!-- ==================== 2. Terminal-Bench 2.1 ==================== -->
+<h2 id="terminal">2. Terminal-Bench 2.1</h2>
+
+<div class="card">
+    <div class="card-header">
+        <h3>终端环境 Agent 任务解决</h3>
+        <span class="badge badge-updated">v2.1 2026-05</span>
+        <span class="badge badge-coding">Terminal</span>
+        <span class="badge badge-agent">Agent</span>
+    </div>
+
+    <dl class="info-grid">
+        <dt>全称</dt>
+        <dd>Terminal-Bench: Benchmarking Agents on Hard, Realistic Tasks in Command Line Interfaces</dd>
+        <dt>创建者</dt>
+        <dd><strong>Stanford x Laude</strong> | 运行于 Harbor Framework</dd>
+        <dt>论文链接</dt>
+        <dd><a href="https://arxiv.org/html/2601.11868v1" target="_blank">arXiv:2601.11868</a> | <a href="https://tbench.ai/leaderboard/terminal-bench/2.1" target="_blank">Leaderboard</a> | <a href="https://github.com/harbor-framework/terminal-bench-2-1" target="_blank">GitHub</a></dd>
+        <dt>评测能力</dt>
+        <dd>Agent 在容器环境中自主完成终端任务：调试、构建、逆向工程、数据处理、安全、ML</dd>
+        <dt>数据规模</dt>
+        <dd><strong>89 个 hard 任务</strong>（v2.1 修改了 26 个任务：修复 bug、超时、奖励 hack 漏洞）</dd>
+        <dt>评分方式</dt>
+        <dd>Task Resolution Success Rate — 检查容器最终状态，非命令序列</dd>
+    </dl>
+
+    <h3 style="margin-top:1rem;">任务类型示例</h3>
+    <table class="score-table">
+        <tr><th>领域</th><th>示例任务</th><th>难度</th></tr>
+        <tr><td>系统管理</td><td>从源码编译 Linux Kernel 并在 QEMU 中运行</td><td>Hard</td></tr>
+        <tr><td>安全</td><td>破解 7z 压缩包密码；创建自签名 TLS 证书</td><td>Medium-Hard</td></tr>
+        <tr><td>数据科学</td><td>在大小/文件数约束下对数据集重分片</td><td>Medium</td></tr>
+        <tr><td>机器学习</td><td>在精度和模型大小约束下训练 FastText 模型</td><td>Hard</td></tr>
+    </table>
+
+    <h3>模型成绩（Leaderboard，harness 敏感）</h3>
+    <table class="score-table">
+        <tr><th>模型 + Harness</th><th>分数</th></tr>
+        <tr><td class="score-best">GPT-5.5 + Codex CLI</td><td class="score-best">83.4%</td></tr>
+        <tr><td>Opus 4.8 + Claude Code</td><td>78.9%</td></tr>
+        <tr><td>GPT-5.5 + Terminus 2</td><td>78.2%</td></tr>
+        <tr><td>Gemini 3.5 Flash</td><td>76.2%</td></tr>
+        <tr><td>Opus 4.8 + Terminus 2</td><td>74.6%</td></tr>
+        <tr><td>Gemini 3.1 Pro + Terminus 2</td><td>70.3%</td></tr>
+        <tr><td>MiniMax M3</td><td>66.0%</td></tr>
+    </table>
+
+    <div class="warning-box">
+        <strong>重要：</strong>Terminal-Bench 分数强依赖 harness/scaffold 选择。
+        同一模型 + 不同 harness 分数差距可达 5-10pp。比较时需注意 harness 一致性。
+        v2.1 修复了 v2.0 中的 reward hacking 漏洞。
+    </div>
+
+    <div class="relevance">
+        <strong>与 Auto Research 的关联：</strong>
+        Agent 核心工作场景就是终端：管理 Slurm 任务、操作 Docker、处理 GPU 环境、调试训练脚本。
+        Terminal-Bench 直接评估这些能力。注意 <strong>Terminal-Bench Science</strong> 正在开发中，
+        将更直接评估科学计算场景。
+    </div>
+</div>
+
+<!-- ==================== 3. HLE ==================== -->
+<h2 id="hle">3. Humanity's Last Exam (HLE)</h2>
+
+<div class="card">
+    <div class="card-header">
+        <h3>人类最后的考试 — 专家级学术知识前沿</h3>
+        <span class="badge badge-hot">Nature 2026</span>
+        <span class="badge badge-reasoning">Reasoning</span>
+    </div>
+
+    <dl class="info-grid">
+        <dt>全称</dt>
+        <dd>Humanity's Last Exam (HLE)</dd>
+        <dt>创建者</dt>
+        <dd><strong>Center for AI Safety + Scale AI</strong> | ~1,000 专家贡献者，500+ 机构，50 个国家</dd>
+        <dt>发布日期</dt>
+        <dd>arXiv 2025-01-24 → Nature 2026-01-28</dd>
+        <dt>论文链接</dt>
+        <dd><a href="https://arxiv.org/abs/2501.14249" target="_blank">arXiv:2501.14249</a> | <a href="https://lastexam.ai" target="_blank">lastexam.ai</a></dd>
+        <dt>评测能力</dt>
+        <dd>专家级学术知识 + 推理能力前沿（100+ 学科：数学/人文/自然科学/...）</dd>
+        <dt>数据规模</dt>
+        <dd><strong>2,500 道题</strong>（多模态：含图表）| 选择题 + 简答题（自动评分）</dd>
+        <dt>评分方式</dt>
+        <dd>Accuracy + Calibration Error（置信度校准）</dd>
+    </dl>
+
+    <h3 style="margin-top:1rem;">设计理念</h3>
+    <ul style="margin-left:1.5rem; margin-top:0.5rem;">
+        <li>每题由全球学科专家出题，<strong>无法通过互联网检索快速回答</strong></li>
+        <li>定位为"最后一个广覆盖闭卷学术 Benchmark"（MMLU 已饱和至 90%+）</li>
+        <li>答案唯一、可验证，适合自动化评测</li>
+        <li>2026.01 发表在 Nature 上</li>
+    </ul>
+
+    <h3>难度阶梯对比</h3>
+    <table class="score-table">
+        <tr><th>Benchmark</th><th>难度定位</th><th>SOTA (2026)</th><th>题量</th></tr>
+        <tr><td>MMLU</td><td>本科水平</td><td>>90%</td><td>14,042</td></tr>
+        <tr><td>GPQA Diamond</td><td>研究生/PhD</td><td>~70%</td><td>198</td></tr>
+        <tr><td><strong>HLE</strong></td><td><strong>全球专家前沿</strong></td><td><strong>~50% (no tools)</strong></td><td><strong>2,500</strong></td></tr>
+    </table>
+
+    <h3>模型成绩</h3>
+    <table class="score-table">
+        <tr><th>模型</th><th>No Tools</th><th>With Tools</th></tr>
+        <tr><td class="score-best">Claude Opus 4.8</td><td class="score-best">49.8%</td><td class="score-best">57.9%</td></tr>
+        <tr><td>Gemini 3.1 Pro</td><td>44.4%</td><td>51.4%</td></tr>
+        <tr><td>GPT-5.5</td><td>41.4%</td><td>52.2%</td></tr>
+    </table>
+
+    <div class="relevance">
+        <strong>与 Auto Research 的关联：</strong>
+        科研 Agent 需要接近专家水平的学科知识来提出创新假设、理解最新论文、设计实验。
+        HLE 衡量模型"科研智商"的天花板。注意 <strong>with tools 分数比 no tools 高 8-11pp</strong>，
+        说明工具增强（搜索、计算）对科研推理有显著提升 — 这正是我们 Agent 的设计方向。
+    </div>
+</div>
+
+<!-- ==================== 4. OSWorld-Verified ==================== -->
+<h2 id="osworld">4. OSWorld-Verified</h2>
+
+<div class="card">
+    <div class="card-header">
+        <h3>操作系统级多模态 Agent 评测（验证版）</h3>
+        <span class="badge badge-updated">Verified 2025-07</span>
+        <span class="badge badge-agent">Agent</span>
+    </div>
+
+    <dl class="info-grid">
+        <dt>全称</dt>
+        <dd>OSWorld-Verified (OSWorld: Benchmarking Multimodal Agents for Open-Ended Tasks in Real Computer Environments)</dd>
+        <dt>创建者</dt>
+        <dd><strong>HKU XLang AI Lab</strong> + Salesforce Research + CMU + Waterloo | Tianbao Xie, Tao Yu 等</dd>
+        <dt>发布日期</dt>
+        <dd>OSWorld: arXiv 2024-04-11 | Verified: 2025-07-28</dd>
+        <dt>论文链接</dt>
+        <dd><a href="https://arxiv.org/abs/2404.07972" target="_blank">arXiv:2404.07972</a> | <a href="https://os-world.github.io/" target="_blank">os-world.github.io</a> | <a href="https://xlang.ai/blog/osworld-verified" target="_blank">Verified Blog</a></dd>
+        <dt>评测能力</dt>
+        <dd>多模态 Agent 在真实 OS（Ubuntu/Windows/macOS）中完成 GUI 操作、跨应用工作流</dd>
+        <dt>数据规模</dt>
+        <dd><strong>369 个任务</strong>（361 个验证可用）| 真实 VM，非模拟</dd>
+        <dt>评分方式</dt>
+        <dd>Execution-based Task Success Rate — 自定义验证脚本检查最终状态</dd>
+    </dl>
+
+    <h3 style="margin-top:1rem;">Verified 升级内容（2025-07-28）</h3>
+    <ul style="margin-left:1.5rem; margin-top:0.5rem;">
+        <li>修复 300+ 社区报告的问题（公开 Google Spreadsheet 追踪）</li>
+        <li>新增 <strong>AWS 支持</strong>：评测时间从 10+ 小时压缩至 1 小时内</li>
+        <li>统一设置下的更新基线</li>
+        <li>验证轨迹托管 HuggingFace</li>
+        <li>贡献机构：MoonShot AI、OpenAI、ByteDance Seed TARS、Anthropic、Simular</li>
+    </ul>
+
+    <h3>模型成绩</h3>
+    <table class="score-table">
+        <tr><th>模型</th><th>成功率</th><th>备注</th></tr>
+        <tr><td class="score-best">Claude Opus 4.8</td><td class="score-best">83.4%</td><td>超越人类基线</td></tr>
+        <tr><td>GPT-5.5</td><td>78.7%</td><td></td></tr>
+        <tr><td>Gemini 3.5 Flash</td><td>78.4%</td><td></td></tr>
+        <tr><td>人类基线</td><td>72.4%</td><td>人类评测者</td></tr>
+        <tr><td>MiniMax M3</td><td>70.1%</td><td>Max Steps=200</td></tr>
+        <tr><td>早期 SOTA (2024)</td><td>12.2%</td><td>首次评测</td></tr>
+    </table>
+
+    <div class="relevance">
+        <strong>与 Auto Research 的关联：</strong>
+        Agent 的环境交互层——操控服务器 GUI/终端/文件系统。<strong>Opus 4.8 已超越人类基线 (83.4% vs 72.4%)</strong>，
+        标志着 OS 操作 Agent 能力趋于成熟。从 2024 年的 12.2% 到 2026 年的 83.4%，
+        说明这一领域在 2 年内经历了质变式提升。
+    </div>
+</div>
+
+<!-- ==================== 5. GDPval-AA ==================== -->
+<h2 id="gdpval">5. GDPval-AA</h2>
+
+<div class="card">
+    <div class="card-header">
+        <h3>经济工作价值评估（Agentic Elo）</h3>
+        <span class="badge badge-new">2025-09</span>
+        <span class="badge badge-reasoning">Knowledge Work</span>
+    </div>
+
+    <dl class="info-grid">
+        <dt>全称</dt>
+        <dd>GDPval-AA = OpenAI GDPval dataset + Artificial Analysis 评测框架</dd>
+        <dt>创建者</dt>
+        <dd><strong>OpenAI</strong>（数据集，2025-09-25）+ <strong>Artificial Analysis</strong>（评测 harness + Elo 排名）</dd>
+        <dt>论文链接</dt>
+        <dd><a href="https://openai.com/index/gdpval/" target="_blank">OpenAI GDPval</a> | <a href="https://arxiv.org/abs/2510.04374" target="_blank">arXiv:2510.04374</a> | <a href="https://artificialanalysis.ai/evaluations/gdpval-aa" target="_blank">AA Leaderboard</a></dd>
+        <dt>评测能力</dt>
+        <dd>经济上有价值的真实知识工作：跨职业、跨行业的专业交付物（非学术考试答案）</dd>
+        <dt>数据规模</dt>
+        <dd><strong>1,320 个专业任务</strong>（220 个 gold set 开源）| 44 个职业 x 9 个美国 GDP 顶级行业</dd>
+        <dt>评分方式</dt>
+        <dd>Agentic loop (shell + 浏览器 via Stirrup) → 盲评 pairwise comparison → <strong>Elo Rating</strong></dd>
+    </dl>
+
+    <h3 style="margin-top:1rem;">设计特色</h3>
+    <ul style="margin-left:1.5rem; margin-top:0.5rem;">
+        <li><strong>非学术考试</strong>：评估真实工作产出（报告、分析、代码、方案），而非选择题</li>
+        <li><strong>Agentic 评测</strong>：模型有 shell 和浏览器工具，模拟真实知识工作者的工具环境</li>
+        <li><strong>Elo 排名</strong>：通过盲评对比计算动态 Elo，比单纯准确率更能反映综合质量</li>
+        <li>覆盖行业：科技、金融、法律、医疗、制造、零售、教育等</li>
+    </ul>
+
+    <h3>模型成绩（Elo Rating）</h3>
+    <table class="score-table">
+        <tr><th>模型</th><th>Elo</th></tr>
+        <tr><td class="score-best">Claude Opus 4.8</td><td class="score-best">1890</td></tr>
+        <tr><td>GPT-5.5</td><td>1769</td></tr>
+        <tr><td>Claude Opus 4.7</td><td>1753</td></tr>
+        <tr><td>Gemini 3.5 Flash</td><td>1656</td></tr>
+        <tr><td>Gemini 3.1 Pro</td><td>1314</td></tr>
+    </table>
+
+    <div class="relevance">
+        <strong>与 Auto Research 的关联：</strong>
+        GDPval-AA 评估的是"能否产出有经济价值的工作交付物"。我们的 Agent 最终产出是研究轨迹 + 实验报告 + 模型改进 —
+        这就是科研领域的"GDP"。GDPval-AA 的 Elo 可以间接预测 Agent 做高质量科研工作的潜力。
+        <strong>Opus 4.8 领先 GPT-5.5 达 121 Elo (约 67% 胜率)</strong>。
+    </div>
+</div>
+
+<!-- ==================== 6. Finance Agent v2 ==================== -->
+<h2 id="finance">6. Finance Agent v2</h2>
+
+<div class="card">
+    <div class="card-header">
+        <h3>金融分析 Agent 评测</h3>
+        <span class="badge badge-updated">v2 2026-05</span>
+        <span class="badge badge-finance">Finance</span>
+        <span class="badge badge-agent">Agent</span>
+    </div>
+
+    <dl class="info-grid">
+        <dt>全称</dt>
+        <dd>Finance Agent Benchmark v2 (FAB v2)</dd>
+        <dt>创建者</dt>
+        <dd><strong>Vals AI</strong> | v2 更新于 2026-05-28</dd>
+        <dt>官方链接</dt>
+        <dd><a href="https://www.vals.ai/benchmarks/fabv2" target="_blank">vals.ai/benchmarks/fabv2</a></dd>
+        <dt>评测能力</dt>
+        <dd>金融分析师级 Agent 工作：公司财报分析、SEC 数据、市场数据推理、合规检查</dd>
+        <dt>数据规模</dt>
+        <dd><strong>927 个专家审核问题</strong>（public + private validation + held-out test）</dd>
+        <dt>时间限制</dt>
+        <dd>每任务 2 小时</dd>
+        <dt>评分方式</dt>
+        <dd><strong>Dealbreaker-gated, severity-weighted partial credit</strong><br>
+            关键项失败 = 0 分 | 严格模式 "All-Pass" 需所有 check 通过</dd>
+    </dl>
+
+    <h3 style="margin-top:1rem;">Agent 工具箱</h3>
+    <ul style="margin-left:1.5rem; margin-top:0.5rem;">
+        <li>SEC EDGAR 搜索</li>
+        <li>Web 搜索 + HTML 解析</li>
+        <li>文档检索（fetched pages）</li>
+        <li>计算器</li>
+        <li>价格历史查询</li>
+    </ul>
+
+    <h3>模型成绩（Partial Credit）</h3>
+    <table class="score-table">
+        <tr><th>模型</th><th>分数</th></tr>
+        <tr><td class="score-best">Gemini 3.5 Flash</td><td class="score-best">57.86%</td></tr>
+        <tr><td>Claude Opus 4.8</td><td>53.92%</td></tr>
+        <tr><td>GPT-5.5</td><td>51.76%</td></tr>
+        <tr><td>Claude Opus 4.7</td><td>51.51%</td></tr>
+    </table>
+
+    <div class="warning-box">
+        <strong>注意：</strong>Finance Agent v2 是少数 Gemini 3.5 Flash 领先 Opus 4.8 的 Benchmark。
+        Vals AI 指出顶尖模型在 partial credit 下仍在 50-58%，All-Pass 标准下低于 40%。
+    </div>
+
+    <div class="relevance">
+        <strong>与 Auto Research 的关联：</strong>
+        Finance Agent v2 评估的"多文档推理 + 数值分析 + 多步决策 + 工具调用"模式与科研 Agent 同构。
+        把"财报"换成"实验报告"，"量化分析"换成"metric 分析"，核心能力一致。
+        <strong>Dealbreaker-gated 评分机制</strong>值得借鉴——科研中一个关键错误也会导致整个实验无效。
+    </div>
+</div>
+
+<!-- ==================== 7. SWE-fficiency ==================== -->
+<h2 id="swe-fficiency">7. SWE-fficiency</h2>
+
+<div class="card">
+    <div class="card-header">
+        <h3>代码性能优化评测 — Pass-to-Pass 而非 Fail-to-Pass</h3>
+        <span class="badge badge-new">ICLR 2026</span>
+        <span class="badge badge-coding">Efficiency</span>
+    </div>
+
+    <dl class="info-grid">
+        <dt>全称</dt>
+        <dd>SWE-fficiency: Can Language Models Optimize Real-World Repositories on Real Workloads?</dd>
+        <dt>创建者</dt>
+        <dd><strong>Harvard + Google DeepMind + Princeton + Xi'an Jiaotong</strong><br>Jeffrey Jian Ma, Milad Hashemi, Amir Yazdanbakhsh, Kevin Swersky, Ofir Press 等</dd>
+        <dt>发布日期</dt>
+        <dd>OpenReview 2025-09-17 → 修订 2026-02-11 → <strong>ICLR 2026</strong></dd>
+        <dt>论文链接</dt>
+        <dd><a href="https://openreview.net/forum?id=J1lgJyP4Tm" target="_blank">OpenReview</a> | <a href="https://github.com/swefficiency/swefficiency" target="_blank">GitHub</a> | <a href="https://swefficiency.com/" target="_blank">swefficiency.com</a></dd>
+        <dt>评测能力</dt>
+        <dd><strong>仓库级性能工程</strong>：找到瓶颈、让代码更快、同时保持正确性（非 Bug 修复）</dd>
+        <dt>数据规模</dt>
+        <dd><strong>498 个任务</strong>，来自 9 个主流 Python 库：numpy, scipy, pandas, scikit-learn, matplotlib, xarray, sympy, dask, astropy</dd>
+        <dt>评分方式</dt>
+        <dd><strong>Speedup Ratio (SR)</strong> = LM speedup / expert speedup，调和平均聚合<br>
+            SR > 1 意味着超越人类专家优化</dd>
+    </dl>
+
+    <h3 style="margin-top:1rem;">与 SWE-bench 核心区别</h3>
+    <table class="score-table">
+        <tr><th>维度</th><th>SWE-bench</th><th>SWE-fficiency</th></tr>
+        <tr><td>任务类型</td><td><strong>Fail-to-Pass</strong>（修 Bug）</td><td><strong>Pass-to-Pass</strong>（优化性能）</td></tr>
+        <tr><td>核心指标</td><td>能否通过测试</td><td>加速比 vs 专家优化</td></tr>
+        <tr><td>代码状态</td><td>有 Bug</td><td>正确但慢</td></tr>
+        <tr><td>考察重点</td><td>理解 + 修复</td><td>Profiling + 算法优化 + 底层调优</td></tr>
+        <tr><td>实际意义</td><td>能否修好代码</td><td>能否写出生产级高效代码</td></tr>
+    </table>
+
+    <h3>评测设置（MiniMax M3 报告）</h3>
+    <table class="score-table">
+        <tr><th>参数</th><th>值</th></tr>
+        <tr><td>Sandbox</td><td>1C2G (1 CPU core, 2GB RAM)</td></tr>
+        <tr><td>Timeout</td><td>2 小时</td></tr>
+        <tr><td>Scaffolding</td><td>Claude Code</td></tr>
+        <tr><td>MiniMax M3 分数</td><td>34.8%</td></tr>
+    </table>
+
+    <div class="warning-box">
+        <strong>注意：</strong>原论文报告当时最佳 Agent 平均 SR &lt; 0.15x 专家水平。
+        MiniMax M3 的 34.8% 可能是 SR 百分比化表示（即 0.348x 专家水平），尚需确认口径。
+    </div>
+
+    <div class="relevance">
+        <strong>与 Auto Research 的关联：</strong>
+        64 卡 GPU 环境下，代码效率直接影响实验周期。DataLoader 瓶颈、内存泄漏、低效 tensor 操作
+        都会浪费宝贵算力。SWE-fficiency 评估的正是"让已有代码跑得更快"的能力 —
+        这是我们 Agent 迭代优化阶段的关键技能。数据来源涵盖 numpy/scipy/pandas，
+        与 ML 训练代码高度相关。
+    </div>
+</div>
+
+<!-- ==================== 8. KernelBench Hard ==================== -->
+<h2 id="kernel">8. KernelBench Hard</h2>
+
+<div class="card">
+    <div class="card-header">
+        <h3>GPU Kernel 优化能力评测（Hard 模式）</h3>
+        <span class="badge badge-new">2026 Q2</span>
+        <span class="badge badge-kernel">CUDA/GPU</span>
+    </div>
+
+    <dl class="info-grid">
+        <dt>全称</dt>
+        <dd>KernelBench-Hard (基于 KernelBench: Can LLMs Write GPU Kernels?)</dd>
+        <dt>创建者</dt>
+        <dd><strong>原版 KernelBench</strong>: Stanford Christopher Re Lab (Anne Ouyang, Azalia Mirhoseini 等, ICML 2025)<br>
+            <strong>Hard 版本</strong>: Infatoshi / kernelbench.com (2026 Q2)</dd>
+        <dt>论文链接</dt>
+        <dd><a href="https://arxiv.org/abs/2502.10517" target="_blank">arXiv:2502.10517</a> (原版) | <a href="https://kernelbench.com/hard" target="_blank">kernelbench.com/hard</a> | <a href="https://github.com/Infatoshi/KernelBench-Hard" target="_blank">GitHub</a></dd>
+        <dt>评测能力</dt>
+        <dd>编写<strong>正确且快速的 CUDA/GPU Kernel</strong>，特别是现代推理 kernel</dd>
+        <dt>数据规模</dt>
+        <dd>原版: 250 个 PyTorch ML 工作负载 | <strong>Hard: 7 个核心 CUDA 问题</strong>（极难）</dd>
+        <dt>硬件平台</dt>
+        <dd>RTX PRO 6000 Blackwell 级 GPU</dd>
+        <dt>评分方式</dt>
+        <dd>原版: <code>fast_p</code>（正确 + 加速比 > p）<br>
+            Hard: <code>peak_fraction</code>（占硬件理论峰值的比例）— 更抗 gaming</dd>
+    </dl>
+
+    <h3 style="margin-top:1rem;">Hard 版本 Kernel 类型</h3>
+    <table class="score-table">
+        <tr><th>Kernel 类型</th><th>难点</th></tr>
+        <tr><td>FP8 GEMM</td><td>Hopper/Blackwell 新精度格式矩阵乘</td></tr>
+        <tr><td>Paged Attention</td><td>KV Cache 分页管理 (LLM 推理核心)</td></tr>
+        <tr><td>Kahan Summation / Softmax</td><td>数值稳定性 + 高性能</td></tr>
+        <tr><td>TopK</td><td>大规模排序选取</td></tr>
+        <tr><td>MoE SwiGLU</td><td>混合专家激活函数</td></tr>
+        <tr><td>W4A16 GEMM</td><td>量化矩阵乘</td></tr>
+    </table>
+
+    <h3>模型成绩（2026-05-28 Rerun）</h3>
+    <table class="score-table">
+        <tr><th>模型</th><th>通过数 / 7</th></tr>
+        <tr><td class="score-best">Claude Opus 4.8</td><td class="score-best">7/7 (100%)</td></tr>
+        <tr><td>GPT-5.5</td><td>6/7 (85.7%)</td></tr>
+        <tr><td>Gemini 3.5 Flash</td><td>5/7 (71.4%)</td></tr>
+        <tr><td>MiniMax M3</td><td>28.8% *</td></tr>
+    </table>
+    <p style="font-size:0.8rem; color:var(--text-secondary);">* MiniMax M3 的 28.8% 可能来自旧版/不同评分口径，官方 Hard 7-problem board 未确认。</p>
+
+    <div class="relevance">
+        <strong>与 Auto Research 的关联：</strong>
+        如果 Agent 能写出高效 CUDA kernel（如自定义 attention、fused operators），
+        可将 64 卡训练效率提升 2-5x。KernelBench Hard 评估的是当前 AI 在底层 GPU 编程上的极限。
+        <strong>Opus 4.8 7/7 全通过</strong>，意味着 Agent 级别的 kernel 优化已成为可能。
+        MiniMax M3 声称在其 FP8 kernel 上实现了 <strong>9.4x 峰值利用率提升</strong>（7.6% → 71.3%）。
+    </div>
+</div>
+
+<!-- ==================== 9. MCP Atlas ==================== -->
+<h2 id="mcp">9. MCP Atlas</h2>
+
+<div class="card">
+    <div class="card-header">
+        <h3>MCP 工具使用能力大规模评测</h3>
+        <span class="badge badge-new">2026-01</span>
+        <span class="badge badge-agent">Tool Use</span>
+    </div>
+
+    <dl class="info-grid">
+        <dt>全称</dt>
+        <dd>MCP-Atlas: A Large-Scale Benchmark for Tool-Use Competency with Real MCP Servers</dd>
+        <dt>创建者</dt>
+        <dd><strong>Scale AI</strong></dd>
+        <dt>发布日期</dt>
+        <dd>arXiv 2026-01-31，修订 2026-05-19</dd>
+        <dt>论文链接</dt>
+        <dd><a href="https://arxiv.org/abs/2602.00933" target="_blank">arXiv:2602.00933</a> | <a href="https://github.com/scaleapi/mcp-atlas" target="_blank">GitHub</a></dd>
+        <dt>评测能力</dt>
+        <dd>通过 MCP 协议发现、选择、调用、组合真实工具的能力</dd>
+        <dt>数据规模</dt>
+        <dd><strong>1,000 个人工编写的任务</strong> | 36 个真实 MCP Server | 220 个工具 | 公开集 500 个</dd>
+        <dt>评分方式</dt>
+        <dd>LLM-as-Judge claim-level scoring：Pass Rate + Coverage Rate + Diagnostics</dd>
+    </dl>
+
+    <h3 style="margin-top:1rem;">评估维度</h3>
+    <table class="score-table">
+        <tr><th>维度</th><th>说明</th></tr>
+        <tr><td>工具发现 (Discovery)</td><td>在 36 个 MCP Server / 220 个工具中识别相关工具</td></tr>
+        <tr><td>Server 选择</td><td>选择正确的 MCP Server 组合</td></tr>
+        <tr><td>多步工具调用</td><td>正确的调用序列和参数填充</td></tr>
+        <tr><td>跨 Server 编排</td><td>组合多个 Server 完成复杂工作流</td></tr>
+        <tr><td>结果合成</td><td>正确整合多工具返回的信息</td></tr>
+    </table>
+
+    <h3>与传统工具评测的区别</h3>
+    <ul style="margin-left:1.5rem; margin-top:0.5rem;">
+        <li><strong>真实 MCP Server</strong>，非 mock API — 更贴近生产环境</li>
+        <li><strong>跨 Server 工作流</strong>，非单次函数调用</li>
+        <li><strong>Claim-level 评分</strong>：分离事实正确性与输出风格，避免 verbose 模型得高分</li>
+    </ul>
+
+    <h3>模型成绩</h3>
+    <table class="score-table">
+        <tr><th>模型</th><th>分数</th></tr>
+        <tr><td class="score-best">Gemini 3.5 Flash</td><td class="score-best">83.6%</td></tr>
+        <tr><td>Claude Opus 4.8</td><td>82.2%</td></tr>
+        <tr><td>Gemini 3.1 Pro</td><td>78.2%</td></tr>
+        <tr><td>GPT-5.5</td><td>75.3%</td></tr>
+        <tr><td>MiniMax M3</td><td>74.2%</td></tr>
+    </table>
+
+    <div class="relevance">
+        <strong>与 Auto Research 的关联：</strong>
+        我们的 Agent 通过 MCP 连接多种工具（Slurm 调度、WandB 日志、Git 操作、数据库查询等）。
+        MCP Atlas 直接评估这种"多工具发现+编排"的能力。<strong>MCP 就是我们 Agent 的"手"</strong>，
+        Atlas 评估的是手的灵巧程度。注意 Gemini 3.5 Flash 在此 Benchmark 上微幅领先 Opus 4.8。
+    </div>
+</div>
+
+<!-- ==================== 10. 其他 Benchmark ==================== -->
+<h2 id="others">10. 其他重要新 Benchmark (2025-2026)</h2>
+
+<div class="card">
+    <div class="card-header">
+        <h3>CursorBench</h3>
+        <span class="badge badge-coding">IDE Coding</span>
+    </div>
+    <dl class="info-grid">
+        <dt>创建者</dt><dd>Cursor (IDE 公司)</dd>
+        <dt>评测能力</dt><dd>Coding Agent 在不同 effort level (低/中/高) 下的表现</dd>
+        <dt>关键发现</dt><dd>Opus 4.8 在所有 effort level 超越前代，工具调用效率显著提升（更少步骤完成同等任务）</dd>
+    </dl>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h3>Online-Mind2Web</h3>
+        <span class="badge badge-agent">Browser Agent</span>
+    </div>
+    <dl class="info-grid">
+        <dt>评测能力</dt><dd>实时网页浏览器操作 Agent</dd>
+        <dt>关键数据</dt><dd>Opus 4.8: <strong>84%</strong> — "meaningful jump over both Opus 4.7 and GPT-5.5"</dd>
+    </dl>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h3>Super-Agent Benchmark</h3>
+        <span class="badge badge-agent">End-to-End</span>
+    </div>
+    <dl class="info-grid">
+        <dt>评测能力</dt><dd>端到端复杂任务完成：翻译、Deep Research、PPT 制作、分析报告</dd>
+        <dt>关键发现</dt><dd>Opus 4.8 是<strong>唯一完成所有 case</strong> 的模型（超 GPT-5.5，成本持平）</dd>
+    </dl>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h3>PostTrainBench</h3>
+        <span class="badge badge-new">New</span>
+    </div>
+    <dl class="info-grid">
+        <dt>评测能力</dt><dd>模型后训练 (post-training) 相关能力</dd>
+        <dt>已知分数</dt><dd>Opus 4.7: 0.42 | GPT-5.5: 0.39 | MiniMax M3: 0.37</dd>
+    </dl>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h3>Harvey Legal Agent Benchmark</h3>
+        <span class="badge badge-finance">Legal</span>
+    </div>
+    <dl class="info-grid">
+        <dt>创建者</dt><dd>Harvey AI (法律科技公司)</dd>
+        <dt>评测能力</dt><dd>实质性法律工作准确率</dd>
+        <dt>关键发现</dt><dd>Opus 4.8 首次在 All-Pass 标准上<strong>突破 10%</strong>（行业里程碑）</dd>
+    </dl>
+</div>
+
+<!-- ==================== 与系统关联 ==================== -->
+<h2 id="our-system">与 Auto Research 系统的关联</h2>
+
+<div class="card" style="border-left: 4px solid var(--primary);">
+    <h3>Agent 能力需求 → Benchmark 映射</h3>
+
+    <table class="score-table">
+        <tr><th>Agent 能力需求</th><th>对应 Benchmark</th><th>当前 SOTA</th><th>优先级</th></tr>
+        <tr>
+            <td>修改训练代码（多文件/长程）</td>
+            <td><strong>SWE-Bench Pro</strong></td>
+            <td>Opus 4.8: 69.2%</td>
+            <td style="color:var(--accent); font-weight:700;">P0</td>
+        </tr>
+        <tr>
+            <td>终端执行（Slurm/Docker/GPU）</td>
+            <td><strong>Terminal-Bench 2.1</strong></td>
+            <td>GPT-5.5+Codex: 83.4%</td>
+            <td style="color:var(--accent); font-weight:700;">P0</td>
+        </tr>
+        <tr>
+            <td>工具编排（MCP 工具链）</td>
+            <td><strong>MCP Atlas</strong></td>
+            <td>Gemini 3.5: 83.6%</td>
+            <td style="color:var(--accent); font-weight:700;">P0</td>
+        </tr>
+        <tr>
+            <td>科研推理/假设生成</td>
+            <td><strong>HLE</strong> + <strong>GDPval-AA</strong></td>
+            <td>Opus 4.8: 57.9% / 1890 Elo</td>
+            <td style="color:var(--warning); font-weight:700;">P1</td>
+        </tr>
+        <tr>
+            <td>代码性能优化</td>
+            <td><strong>SWE-fficiency</strong></td>
+            <td>M3: 34.8%</td>
+            <td style="color:var(--warning); font-weight:700;">P1</td>
+        </tr>
+        <tr>
+            <td>OS/GUI 操作</td>
+            <td><strong>OSWorld-Verified</strong></td>
+            <td>Opus 4.8: 83.4%</td>
+            <td style="color:var(--text-secondary);">P2</td>
+        </tr>
+        <tr>
+            <td>GPU Kernel 优化</td>
+            <td><strong>KernelBench Hard</strong></td>
+            <td>Opus 4.8: 7/7</td>
+            <td style="color:var(--text-secondary);">P2</td>
+        </tr>
+        <tr>
+            <td>多文档数值推理</td>
+            <td><strong>Finance Agent v2</strong></td>
+            <td>Gemini 3.5: 57.86%</td>
+            <td style="color:var(--text-secondary);">P2</td>
+        </tr>
+    </table>
+</div>
+
+<div class="card" style="border-left: 4px solid var(--secondary);">
+    <h3>关键洞察</h3>
+    <ul style="margin-left:1.5rem; margin-top:0.5rem; line-height:2;">
+        <li><strong>模型选择：</strong>Opus 4.8 在 6/9 个 Benchmark 上排名第一，是当前最全面的 Agent 后端</li>
+        <li><strong>Harness 重要性：</strong>Terminal-Bench 证明 scaffold/harness 对分数影响巨大（同模型差 5-10pp），
+            我们的 LangGraph 编排质量直接影响 Agent 上限</li>
+        <li><strong>Tools 加成：</strong>HLE 证明工具增强能提升 8-11pp，验证了我们"Agent + 工具"的设计方向</li>
+        <li><strong>效率是新前沿：</strong>SWE-fficiency + KernelBench 标志着评测从"能做到"转向"做得又对又快"</li>
+        <li><strong>MCP 成为标准：</strong>MCP Atlas 的出现说明 MCP 已成为 Agent 工具使用的标准协议层</li>
+    </ul>
+</div>
+
+<div class="card" style="border-left: 4px solid var(--accent);">
+    <h3>建议：纳入我们评测体系的 Benchmark</h3>
+
+    <table class="score-table">
+        <tr><th>里程碑</th><th>评测方式</th><th>目的</th></tr>
+        <tr>
+            <td>M2 (W4)</td>
+            <td>自建 Mini-Terminal-Bench (10-15 tasks, Slurm 环境)</td>
+            <td>验证 Agent 基本终端操作能力</td>
+        </tr>
+        <tr>
+            <td>M3 (W6)</td>
+            <td>自建 CV-SWE-bench (20 tasks, 从真实 CV repo PR 构建)</td>
+            <td>验证代码修改能力</td>
+        </tr>
+        <tr>
+            <td>M4 (W8)</td>
+            <td>MLE-bench subset + 自建 metric (mAP/mIoU 提升率)</td>
+            <td>验证端到端 ML 实验能力</td>
+        </tr>
+        <tr>
+            <td>M5+ (W10+)</td>
+            <td>KernelBench (标准版) + 训练效率测试</td>
+            <td>Agent 能否优化训练代码性能</td>
+        </tr>
+    </table>
+</div>
+
+<!-- ==================== Footer ==================== -->
+<div style="margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid var(--border); font-size: 0.85rem; color: var(--text-secondary);">
+    <h3 style="font-size: 1rem; margin-bottom: 0.5rem;">数据来源</h3>
+    <ul style="margin-left: 1.5rem;">
+        <li><strong>SWE-Bench Pro:</strong> <a href="https://arxiv.org/abs/2509.16941">arXiv:2509.16941</a> (Scale AI, 2025-09) | <a href="https://scaleapi.github.io/SWE-bench_Pro-os/">官方页面</a></li>
+        <li><strong>Terminal-Bench 2.1:</strong> <a href="https://arxiv.org/html/2601.11868v1">arXiv:2601.11868</a> | <a href="https://tbench.ai/leaderboard/terminal-bench/2.1">Leaderboard</a> | <a href="https://github.com/harbor-framework/terminal-bench-2-1">GitHub</a></li>
+        <li><strong>HLE:</strong> <a href="https://arxiv.org/abs/2501.14249">arXiv:2501.14249</a> | <a href="https://lastexam.ai">lastexam.ai</a> | Nature 2026</li>
+        <li><strong>OSWorld-Verified:</strong> <a href="https://arxiv.org/abs/2404.07972">arXiv:2404.07972</a> | <a href="https://os-world.github.io/">os-world.github.io</a> | <a href="https://xlang.ai/blog/osworld-verified">Verified Blog</a></li>
+        <li><strong>GDPval-AA:</strong> <a href="https://openai.com/index/gdpval/">OpenAI GDPval</a> | <a href="https://arxiv.org/abs/2510.04374">arXiv:2510.04374</a> | <a href="https://artificialanalysis.ai/evaluations/gdpval-aa">AA Leaderboard</a></li>
+        <li><strong>Finance Agent v2:</strong> <a href="https://www.vals.ai/benchmarks/fabv2">Vals AI FABv2</a></li>
+        <li><strong>SWE-fficiency:</strong> <a href="https://openreview.net/forum?id=J1lgJyP4Tm">OpenReview (ICLR 2026)</a> | <a href="https://github.com/swefficiency/swefficiency">GitHub</a> | <a href="https://swefficiency.com/">swefficiency.com</a></li>
+        <li><strong>KernelBench Hard:</strong> <a href="https://arxiv.org/abs/2502.10517">arXiv:2502.10517</a> (原版) | <a href="https://kernelbench.com/hard">kernelbench.com/hard</a> | <a href="https://github.com/Infatoshi/KernelBench-Hard">GitHub</a></li>
+        <li><strong>MCP Atlas:</strong> <a href="https://arxiv.org/abs/2602.00933">arXiv:2602.00933</a> (Scale AI, 2026-01) | <a href="https://github.com/scaleapi/mcp-atlas">GitHub</a></li>
+        <li><strong>Opus 4.8:</strong> <a href="https://www.anthropic.com/research/claude-opus-4-8">Anthropic Blog</a> | System Card PDF</li>
+        <li><strong>MiniMax M3:</strong> <a href="https://www.minimax.io/blog/minimax-m3">MiniMax Blog</a></li>
+    </ul>
+    <p style="margin-top: 0.8rem;">
+        <em>调研方式: CCG 三方 (Claude WebFetch + Codex/GPT-5.5 联网搜索 + Gemini [failed])，2026-06-01。</em><br>
+        <em>MiniMax M3 分数来自厂商公告，部分尚未被 Benchmark 官方确认。</em>
+    </p>
+</div>
+
+</div>
+</body>
+</html>
