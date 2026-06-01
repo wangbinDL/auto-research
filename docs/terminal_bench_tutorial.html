@@ -1,0 +1,1070 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terminal-Bench 完全教程 | Auto Research</title>
+    <style>
+        :root {
+            --primary: #1a73e8;
+            --primary-dark: #1557b0;
+            --primary-light: #e8f0fe;
+            --secondary: #34a853;
+            --secondary-light: #e8f5e9;
+            --accent: #ea4335;
+            --accent-light: #fce8e6;
+            --warning: #fbbc04;
+            --warning-light: #fef7e0;
+            --purple: #9334e6;
+            --purple-light: #f3e8fd;
+            --bg: #f8f9fa;
+            --card-bg: #ffffff;
+            --text: #202124;
+            --text-secondary: #5f6368;
+            --border: #e8eaed;
+            --code-bg: #f1f3f4;
+            --code-text: #174ea6;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans SC', 'PingFang SC', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.75;
+            padding: 2rem;
+        }
+        .container { max-width: 1200px; margin: 0 auto; }
+
+        h1 { font-size: 2.4rem; margin-bottom: 0.5rem; color: var(--primary-dark); }
+        h2 {
+            font-size: 1.7rem; margin: 3rem 0 1rem; padding: 0.6rem 0 0.6rem 1rem;
+            background: linear-gradient(90deg, var(--primary-light), transparent);
+            border-left: 5px solid var(--primary);
+            color: var(--primary-dark);
+        }
+        h3 { font-size: 1.25rem; margin: 1.8rem 0 0.8rem; color: var(--text); padding-bottom: 0.3rem; border-bottom: 1px solid var(--border); }
+        h4 { font-size: 1.05rem; margin: 1.2rem 0 0.6rem; color: var(--primary-dark); }
+        p { margin: 0.7rem 0; }
+        .subtitle { color: var(--text-secondary); font-size: 1rem; margin-bottom: 2rem; }
+        .meta { font-size: 0.85rem; color: var(--text-secondary); margin: 0.5rem 0 1.5rem; }
+
+        /* 标签 */
+        .badge { display: inline-block; padding: 2px 10px; border-radius: 12px; font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px; margin-right: 4px; }
+        .badge-paper { background: var(--primary-light); color: var(--primary-dark); }
+        .badge-code { background: var(--secondary-light); color: #1b5e20; }
+        .badge-warning { background: var(--warning-light); color: #b06000; }
+        .badge-accent { background: var(--accent-light); color: var(--accent); }
+        .badge-purple { background: var(--purple-light); color: var(--purple); }
+        .badge-level-easy { background: #d4f4dd; color: #1b5e20; }
+        .badge-level-medium { background: #fef7e0; color: #b06000; }
+        .badge-level-hard { background: #fce8e6; color: #c5221f; }
+
+        /* 卡片 */
+        .card { background: var(--card-bg); border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04); border: 1px solid var(--border); }
+        .card-tinted-primary { border-left: 5px solid var(--primary); }
+        .card-tinted-secondary { border-left: 5px solid var(--secondary); }
+        .card-tinted-warning { border-left: 5px solid var(--warning); background: linear-gradient(180deg, var(--warning-light), var(--card-bg) 40%); }
+        .card-tinted-purple { border-left: 5px solid var(--purple); }
+        .card-tinted-accent { border-left: 5px solid var(--accent); }
+
+        /* 目录 */
+        .toc { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem 2rem; margin-bottom: 2rem; }
+        .toc h3 { border: none; margin-top: 0; font-size: 1.1rem; }
+        .toc ol { list-style: none; counter-reset: toc; column-count: 2; column-gap: 2rem; }
+        .toc li { counter-increment: toc; padding: 0.3rem 0; break-inside: avoid; }
+        .toc li::before { content: counter(toc, decimal) ". "; color: var(--primary); font-weight: 700; }
+        .toc a { color: var(--text); text-decoration: none; }
+        .toc a:hover { color: var(--primary); text-decoration: underline; }
+
+        /* 表格 */
+        table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.9rem; }
+        th { background: var(--primary); color: white; padding: 0.6rem 1rem; text-align: left; font-weight: 500; }
+        td { padding: 0.55rem 1rem; border-bottom: 1px solid var(--border); vertical-align: top; }
+        tr:nth-child(even) { background: #fafbfc; }
+        tr:hover { background: var(--primary-light); }
+        .score-best { font-weight: 700; color: var(--secondary); }
+
+        /* 信息网格 */
+        .info-grid { display: grid; grid-template-columns: 160px 1fr; gap: 0.4rem 1.5rem; font-size: 0.92rem; margin: 0.5rem 0; }
+        .info-grid dt { font-weight: 600; color: var(--text-secondary); }
+        .info-grid dd { color: var(--text); }
+
+        /* 代码 */
+        code { background: var(--code-bg); color: var(--code-text); padding: 2px 6px; border-radius: 4px; font-size: 0.85em; font-family: 'SF Mono', Menlo, Consolas, monospace; }
+        pre { background: #1e1e1e; color: #d4d4d4; padding: 1.2rem 1.5rem; border-radius: 8px; overflow-x: auto; margin: 1rem 0; font-size: 0.85rem; line-height: 1.6; font-family: 'SF Mono', Menlo, Consolas, monospace; }
+        pre .comment { color: #6a9955; }
+        pre .keyword { color: #c586c0; }
+        pre .string { color: #ce9178; }
+        pre .function { color: #dcdcaa; }
+        pre .number { color: #b5cea8; }
+
+        /* 提示框 */
+        .note { margin: 1rem 0; padding: 0.8rem 1rem; border-radius: 8px; font-size: 0.9rem; }
+        .note-tip { background: var(--secondary-light); border-left: 4px solid var(--secondary); }
+        .note-warning { background: var(--warning-light); border-left: 4px solid var(--warning); }
+        .note-danger { background: var(--accent-light); border-left: 4px solid var(--accent); }
+        .note-info { background: var(--primary-light); border-left: 4px solid var(--primary); }
+        .note-purple { background: var(--purple-light); border-left: 4px solid var(--purple); }
+        .note strong { display: block; margin-bottom: 0.3rem; }
+
+        /* 步骤 */
+        .step { display: flex; gap: 1rem; margin: 1.2rem 0; padding: 1rem; background: var(--card-bg); border-radius: 8px; border: 1px solid var(--border); }
+        .step-number { flex-shrink: 0; width: 36px; height: 36px; border-radius: 50%; background: var(--primary); color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; }
+        .step-content { flex: 1; }
+        .step-content h4 { margin-top: 0; }
+
+        /* 概念框 */
+        .concept { background: linear-gradient(135deg, var(--primary-light), #ffffff); border-radius: 12px; padding: 1.5rem; margin: 1.2rem 0; border: 1px solid var(--primary); }
+        .concept h4 { color: var(--primary-dark); margin-top: 0; }
+
+        /* 引用 */
+        blockquote { border-left: 4px solid var(--border); padding-left: 1rem; color: var(--text-secondary); font-style: italic; margin: 0.8rem 0; }
+
+        /* 任务网格 */
+        .task-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 0.5rem; margin: 1rem 0; font-size: 0.85rem; }
+        .task-item { background: var(--code-bg); padding: 0.4rem 0.7rem; border-radius: 6px; border-left: 3px solid var(--primary); }
+        .task-item.hard { border-left-color: var(--accent); }
+        .task-item.medium { border-left-color: var(--warning); }
+
+        /* 流程图 */
+        .flow { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; margin: 1.5rem 0; }
+        .flow-box { background: var(--card-bg); border: 2px solid var(--primary); border-radius: 8px; padding: 0.7rem 1rem; font-size: 0.9rem; font-weight: 500; }
+        .flow-arrow { color: var(--primary); font-size: 1.4rem; font-weight: 700; }
+
+        /* 维度对比 */
+        .compare-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin: 1rem 0; }
+        .compare-item { background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; padding: 1rem; }
+        .compare-item .icon { font-size: 1.5rem; margin-bottom: 0.3rem; }
+        .compare-item h5 { margin: 0.3rem 0; color: var(--primary-dark); font-size: 0.95rem; }
+        .compare-item p { font-size: 0.82rem; color: var(--text-secondary); margin: 0; }
+
+        a { color: var(--primary); text-decoration: none; }
+        a:hover { text-decoration: underline; }
+
+        ul, ol { margin: 0.5rem 0 0.5rem 1.5rem; }
+        li { padding: 0.2rem 0; }
+
+        @media (max-width: 768px) { body { padding: 1rem; } h1 { font-size: 1.8rem; } h2 { font-size: 1.3rem; } .info-grid { grid-template-columns: 1fr; } .toc ol { column-count: 1; } .task-grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+<div class="container">
+
+<h1>Terminal-Bench 完全教程</h1>
+<p class="subtitle">从原理到实践：掌握 AI Agent 终端能力评测的事实标准</p>
+<p class="meta">
+    📅 2026-06-01 | 🏷️ 来源: tbench.ai + arXiv:2601.11868 + Claude (WebFetch) 调研 | 🛠️ 工具: Codex/Gemini (CCG 模式)
+</p>
+
+<div class="toc">
+    <h3>📑 目录</h3>
+    <ol>
+        <li><a href="#intro">1. 什么是 Terminal-Bench？</a></li>
+        <li><a href="#why">2. 为什么需要它？</a></li>
+        <li><a href="#arch">3. 核心架构：Harbor + Task Format</a></li>
+        <li><a href="#task">4. 一个任务的完整解剖</a></li>
+        <li><a href="#capabilities">5. 它能度量哪些能力？</a></li>
+        <li><a href="#models">6. 模型与 Agent 性能横评</a></li>
+        <li><a href="#compare">7. 与其他 Benchmark 的对比</a></li>
+        <li><a href="#run">8. 如何自己跑 Terminal-Bench？</a></li>
+        <li><a href="#create">9. 如何合成自定义任务？</a></li>
+        <li><a href="#errors">10. 错误分析：模型在哪里失败？</a></li>
+        <li><a href="#limitations">11. 局限性与挑战</a></li>
+        <li><a href="#our-bench">12. 我们的 Auto Research 怎么借鉴？</a></li>
+    </ol>
+</div>
+
+<!-- ==================== 1. 介绍 ==================== -->
+<h2 id="intro">1. 什么是 Terminal-Bench？</h2>
+
+<div class="concept">
+    <h4>🎯 一句话定义</h4>
+    <p><strong>Terminal-Bench 是一个评测 AI Agent 在真实终端环境中完成长程、多领域、硬核任务能力的基准测试。</strong>它包含 89 个由 93 位专家贡献者创建的高难度任务，每个任务都在真实 Docker 容器中执行，最终由自动化测试验证成败。</p>
+</div>
+
+<h3>用三个比喻理解它</h3>
+
+<div class="compare-grid">
+    <div class="compare-item">
+        <div class="icon">🎓</div>
+        <h5>像"程序员认证考试"</h5>
+        <p>但不是选择题，而是真实环境操作题 — Agent 拿到题面，在 Docker 中操作，提交结果被自动批改</p>
+    </div>
+    <div class="compare-item">
+        <div class="icon">🏗️</div>
+        <h5>像"蓝翔挖掘机实操"</h5>
+        <p>不是笔试考挖掘机理论，而是真给一台挖掘机，看你能不能挖出一条沟 — Terminal-Bench 给你一个 Docker 容器，看你能不能完成真实的工程任务</p>
+    </div>
+    <div class="compare-item">
+        <div class="icon">🧪</div>
+        <h5>像"化学实验考试"</h5>
+        <p>给你试剂、器材和实验目标，看你能不能在限定时间内完成实验并验证产物 — 评测的是<strong>动手能力</strong>而非知识</p>
+    </div>
+</div>
+
+<h3>关键事实</h3>
+
+<div class="info-grid">
+    <dt>创建者</dt>
+    <dd><strong>Stanford + Laude Institute</strong> 联合团队（Mike A. Merrill, Alexander G. Shaw, Nicholas Carlini 等 85 位作者）</dd>
+    <dt>版本</dt>
+    <dd><strong>Terminal-Bench 2.0</strong>（2026 年初发布），前身为 1.0（80 任务）</dd>
+    <dt>任务数</dt>
+    <dd><strong>89 个高难度任务</strong>（从 229 个候选中精选，3 位人类专家审核 ~3 小时/任务）</dd>
+    <dt>运行环境</dt>
+    <dd><strong>Harbor Framework</strong> — Docker 容器，每个任务独立隔离</dd>
+    <dt>验证方式</dt>
+    <dd><strong>Outcome-driven</strong>：检查容器最终状态，不检查执行过程</dd>
+    <dt>支持 Agent</dt>
+    <dd>Claude Code, Codex CLI, Gemini CLI, OpenHands, Mini-SWE-Agent, Terminus 2</dd>
+    <dt>论文</dt>
+    <dd><a href="https://arxiv.org/abs/2601.11868" target="_blank">arXiv:2601.11868</a> (2026-01-17)</dd>
+    <dt>官网</dt>
+    <dd><a href="https://www.tbench.ai/benchmarks/terminal-bench-2" target="_blank">tbench.ai/benchmarks/terminal-bench-2</a></dd>
+    <dt>GitHub</dt>
+    <dd><a href="https://github.com/laude-institute/terminal-bench" target="_blank">github.com/laude-institute/terminal-bench</a></dd>
+</div>
+
+<!-- ==================== 2. 为什么需要 ==================== -->
+<h2 id="why">2. 为什么需要 Terminal-Bench？</h2>
+
+<div class="card card-tinted-primary">
+    <h3>🤔 背景：AI Agent 评测的两难困境</h3>
+    <p>论文开篇即指出当前 Benchmark 体系的两个根本问题：</p>
+    <ol>
+        <li><strong>不真实</strong>：现有评测多是"考试题"风格（选择题 / 简单代码补全），无法反映真实工程任务的复杂性</li>
+        <li><strong>不够难</strong>：前沿模型在很多 Benchmark 上已达 90%+，区分度不足（"饱和"现象）</li>
+    </ol>
+</div>
+
+<h3>终端的特殊价值</h3>
+
+<div class="concept">
+    <h4>为什么选"终端（Terminal）"作为评测环境？</h4>
+    <p>终端是软件工程、科学计算、网络安全、ML 训练等高价值工作的<strong>通用底层接口</strong>。它有三个独特优势：</p>
+    <ol>
+        <li><strong>无处不在</strong>：从开发者到数据科学家，99% 的技术工作流都涉及终端</li>
+        <li><strong>功能强大</strong>：可以操作文件系统、运行程序、调用 API、调试进程 — 等于给 Agent 一台"白盒电脑"</li>
+        <li><strong>文字天然</strong>：基于文本，与 LLM 的天然输入/输出格式一致，零格式转换损失</li>
+    </ol>
+    <p>截至 2026 年初，<strong>Anthropic 声称 Claude Code 驱动了 10 亿美元的运行收入</strong>（论文引述），终端 Agent 已是商业现实。</p>
+</div>
+
+<h3>它填补了什么空白？</h3>
+
+<table>
+    <tr><th>评测类型</th><th>代表 Benchmark</th><th>短板</th></tr>
+    <tr><td>代码补全</td><td>HumanEval, MBPP</td><td>简单函数补全，几十行内</td></tr>
+    <tr><td>Bug 修复</td><td>SWE-bench, SWE-bench Verified</td><td>聚焦"修 Bug"，不改构建/编译/部署</td></tr>
+    <tr><td>工具使用</td><td>τ-Bench, BFCL</td><td>结构化 API 调用，无真实环境</td></tr>
+    <tr><td>浏览器/桌面</td><td>WebArena, OSWorld</td><td>GUI 操作，与代码工程场景脱节</td></tr>
+    <tr><td><strong>Terminal-Bench</strong></td><td><strong>—</strong></td><td><strong>真实长程工程任务：编译、训练、部署、逆向、安全</strong></td></tr>
+</table>
+
+<!-- ==================== 3. 架构 ==================== -->
+<h2 id="arch">3. 核心架构：Harbor + Task Format</h2>
+
+<div class="card card-tinted-secondary">
+    <h3>🏛️ 两层架构</h3>
+    <p>Terminal-Bench 由两部分组成：</p>
+    <ol>
+        <li><strong>数据集（Dataset）</strong>：89 个标准化任务文件</li>
+        <li><strong>执行框架（Harbor）</strong>：把任务运行起来、连接 Agent、收集结果的基础设施</li>
+    </ol>
+</div>
+
+<h3>Harbor 框架：Terminal-Bench 的"操作系统"</h3>
+
+<div class="card">
+    <p>Harbor 是 Terminal-Bench 团队（Laude Institute）发布的<strong>通用 Agent 评测框架</strong>，Terminal-Bench 2.0 已迁移到 Harbor 上运行。Harbor 的核心能力：</p>
+
+    <div class="compare-grid">
+        <div class="compare-item">
+            <div class="icon">🔌</div>
+            <h5>多 Agent 接入</h5>
+            <p>Claude Code, Codex CLI, OpenHands, Mini-SWE-Agent, Terminus 2 一键切换</p>
+        </div>
+        <div class="compare-item">
+            <div class="icon">🐳</div>
+            <h5>沙箱容器化</h5>
+            <p>每个任务一个 Docker 容器，完全隔离，可并行</p>
+        </div>
+        <div class="compare-item">
+            <div class="icon">☁️</div>
+            <h5>云端并行</h5>
+            <p>Daytona, Modal 等云 provider，单实验 100+ 并发</p>
+        </div>
+        <div class="compare-item">
+            <div class="icon">📊</div>
+            <h5>RL 训练数据</h5>
+            <p>轨迹持久化，可直接喂给 RL 算法做训练</p>
+        </div>
+    </div>
+
+    <p style="margin-top:1rem;">核心命令极其简单：</p>
+<pre><span class="comment"># 安装 Harbor</span>
+uv tool install harbor
+<span class="comment"># 或 pip install harbor</span>
+
+<span class="comment"># 跑 Terminal-Bench 2.0 + Claude Code (本地 Docker)</span>
+harbor run --dataset terminal-bench@2.0 \
+   --agent claude-code \
+   --model anthropic/claude-opus-4-1 \
+   --n-concurrent 4
+
+<span class="comment"># 跑 Terminal-Bench 2.0 + Claude Code (云端 Daytona，100 并发)</span>
+harbor run --dataset terminal-bench@2.0 \
+   --agent claude-code \
+   --model anthropic/claude-opus-4-1 \
+   --n-concurrent 100 \
+   --env daytona</pre>
+</div>
+
+<h3>Task 完整目录结构</h3>
+
+<div class="card card-tinted-primary">
+    <p>每个 Terminal-Bench 任务就是一个标准化的目录：</p>
+<pre>tasks/
+└── adaptive-rejection-sampler/        <span class="comment"># 任务名 (kebab-case)</span>
+    ├── task.yaml                       <span class="comment"># 任务元数据（名称、描述、类别、难度、时间）</span>
+    ├── Dockerfile                      <span class="comment"># 任务环境定义（基础镜像 + 依赖安装）</span>
+    ├── docker-compose.yaml             <span class="comment"># 容器编排（端口挂载等）</span>
+    ├── solution.sh                     <span class="comment"># Oracle 参考解法（人类写的"标准答案"）</span>
+    ├── run-tests.sh                    <span class="comment"># 评测入口：调用 pytest 或自定义测试</span>
+    ├── tests/                          <span class="comment"># 测试目录</span>
+    │   ├── test_outputs.py
+    │   └── test_outputs.sh
+    ├── environment/                    <span class="comment"># 预置数据/资源（不是给 Agent 的初始代码）</span>
+    │   └── bn_sample_10k.csv
+    └── instruction.md (或 task.yaml 内) <span class="comment"># 给 Agent 看的题面</span></pre>
+</div>
+
+<!-- ==================== 4. 任务解剖 ==================== -->
+<h2 id="task">4. 一个任务的完整解剖</h2>
+
+<h3>示例任务：adaptive-rejection-sampler（科学计算 / Medium）</h3>
+
+<div class="card card-tinted-primary">
+    <h4>📋 任务说明（给 Agent 看）</h4>
+    <blockquote>
+        你的任务是根据 Gilks et al. (1992) 实现一个<strong>自适应拒绝采样器</strong>（Adaptive Rejection Sampler, ARS）：
+        <ol>
+            <li>你的实现应允许用户输入采样数量，并验证输入合法性</li>
+            <li>主输入应该是一个函数或表达式，计算目标分布的密度（向量化的，如 R 中的 <code>dnorm</code>）</li>
+            <li>代码应包含对<strong>非对数凹分布</strong>的检查</li>
+            <li>需要正式测试，对比已知分布的采样结果</li>
+            <li>代码应模块化，整体设计风格一致</li>
+        </ol>
+        <strong>要求：</strong>
+        <ul>
+            <li>安装 R（如未安装），用 R 实现</li>
+            <li>主实现保存为 <code>/app/ars.R</code></li>
+            <li>主函数名 <code>ars</code>，测试函数名 <code>test</code></li>
+            <li>输出格式：<code>TEST_NAME: PASS</code> 或 <code>TEST_NAME: FAIL</code>，含 mean 和 std 统计</li>
+            <li>生成至少一个采样文件 <code>/app/normal_samples.txt</code> 或 <code>/app/exponential_samples.txt</code></li>
+        </ul>
+        <strong>参考文献：</strong>Gilks, W. R., & Wild, P. (1992). Adaptive rejection sampling for Gibbs sampling.
+    </blockquote>
+</div>
+
+<h3>任务执行流程</h3>
+
+<div class="flow">
+    <div class="flow-box">1. Harbor 启动<br>Docker 容器</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box">2. 安装任务<br>环境 (R)</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box">3. 注入<br>instruction</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box">4. Agent 开始<br>交互循环</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box">5. Agent 调用<br>Bash 工具</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box">6. 测试验证<br>最终状态</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box">7. 报告<br>Pass/Fail</div>
+</div>
+
+<h3>Outcome-driven 验证（关键设计）</h3>
+
+<div class="note note-info">
+    <strong>💡 关键设计哲学：检查"结果"而非"过程"</strong>
+    <p>论文明确指出：<em>"tests verify that all outcomes described in the instruction have been achieved by testing properties of the final container state; they do not test the agent's commands or console output."</em></p>
+    <p>这意味着：Agent 可以用任何方法（编辑文件、跑命令、装包、调用 API）完成任务，只要最终容器状态满足测试就算通过。这种设计让 Terminal-Bench 能容纳<strong>多种解法</strong>，真正评测的是结果而非解法。</p>
+</div>
+
+<h3>89 个任务的完整分布</h3>
+
+<div class="card">
+    <p>89 个任务覆盖 <strong>20+ 个领域</strong>，按论文 Figure 4 数据：</p>
+    <div class="task-grid">
+        <div class="task-item">adaptive-rejection-sampler</div>
+        <div class="task-item hard">bn-fit-modify</div>
+        <div class="task-item">break-filter-js-from-html</div>
+        <div class="task-item">build-cython-ext</div>
+        <div class="task-item">build-pmars</div>
+        <div class="task-item">build-pov-ray</div>
+        <div class="task-item">caffe-cifar-10</div>
+        <div class="task-item">cancel-async-tasks</div>
+        <div class="task-item">chess-best-move</div>
+        <div class="task-item">circuit-fibsqrt</div>
+        <div class="task-item">cobol-modernization</div>
+        <div class="task-item">code-from-image</div>
+        <div class="task-item hard">compile-compcert</div>
+        <div class="task-item">configure-git-webserver</div>
+        <div class="task-item">constraints-scheduling</div>
+        <div class="task-item">count-dataset-tokens</div>
+        <div class="task-item">crack-7z-hash</div>
+        <div class="task-item">custom-memory-heap-crash</div>
+        <div class="task-item">db-wal-recovery</div>
+        <div class="task-item">distribution-search</div>
+        <div class="task-item hard">dna-assembly</div>
+        <div class="task-item">dna-insert</div>
+        <div class="task-item">extract-elf</div>
+        <div class="task-item">extract-moves-from-video</div>
+        <div class="task-item hard">feal-differential-cryptanalysis</div>
+        <div class="task-item hard">feal-linear-cryptanalysis</div>
+        <div class="task-item">filter-js-from-html</div>
+        <div class="task-item">financial-document-processor</div>
+        <div class="task-item">fix-code-vulnerability</div>
+        <div class="task-item">fix-git</div>
+        <div class="task-item hard">fix-ocaml-gc</div>
+        <div class="task-item">gcode-to-text</div>
+        <div class="task-item">git-leak-recovery</div>
+        <div class="task-item">git-multibranch</div>
+        <div class="task-item">gpt2-codegolf</div>
+        <div class="task-item">headless-terminal</div>
+        <div class="task-item">hf-model-inference</div>
+        <div class="task-item">install-windows-3.11</div>
+        <div class="task-item">kv-store-grpc</div>
+        <div class="task-item">large-scale-text-editing</div>
+        <div class="task-item">largest-eigenval</div>
+        <div class="task-item">llm-inference-batching-scheduler</div>
+        <div class="task-item">log-summary-date-ranges</div>
+        <div class="task-item">mailman</div>
+        <div class="task-item">make-doom-for-mips</div>
+        <div class="task-item">make-mips-interpreter</div>
+        <div class="task-item hard">mcmc-sampling-stan</div>
+        <div class="task-item">merge-diff-arc-agi-task</div>
+        <div class="task-item hard">model-extraction-relu-logits</div>
+        <div class="task-item">modernize-scientific-stack</div>
+        <div class="task-item">mteb-leaderboard</div>
+        <div class="task-item">mteb-retrieve</div>
+        <div class="task-item">multi-source-data-merger</div>
+        <div class="task-item">nginx-request-logging</div>
+        <div class="task-item">openssl-selfsigned-cert</div>
+        <div class="task-item">overfull-hbox</div>
+        <div class="task-item">password-recovery</div>
+        <div class="task-item hard">path-tracing</div>
+        <div class="task-item hard">path-tracing-reverse</div>
+        <div class="task-item">polyglot-c-py</div>
+        <div class="task-item">polyglot-rust-c</div>
+        <div class="task-item">portfolio-optimization</div>
+        <div class="task-item hard">protein-assembly</div>
+        <div class="task-item hard">prove-plus-comm</div>
+        <div class="task-item">pypi-server</div>
+        <div class="task-item">pytorch-model-cli</div>
+        <div class="task-item">pytorch-model-recovery</div>
+        <div class="task-item">qemu-alpine-ssh</div>
+        <div class="task-item">qemu-startup</div>
+        <div class="task-item">query-optimize</div>
+        <div class="task-item">raman-fitting</div>
+        <div class="task-item">regex-chess</div>
+        <div class="task-item">regex-log</div>
+        <div class="task-item">reshard-c4-data</div>
+        <div class="task-item">rstan-to-pystan</div>
+        <div class="task-item">sam-cell-seg</div>
+        <div class="task-item">sanitize-git-repo</div>
+        <div class="task-item hard">schemelike-metacircular-eval</div>
+        <div class="task-item">sparql-university</div>
+        <div class="task-item">sqlite-db-truncate</div>
+        <div class="task-item">sqlite-with-gcov</div>
+        <div class="task-item">torch-pipeline-parallelism</div>
+        <div class="task-item">torch-tensor-parallelism</div>
+        <div class="task-item">train-fasttext</div>
+        <div class="task-item">tune-mjcf</div>
+        <div class="task-item">video-processing</div>
+        <div class="task-item">vulnerable-secret</div>
+        <div class="task-item hard">winning-avg-corewars</div>
+        <div class="task-item">write-compressor</div>
+    </div>
+    <p style="margin-top:1rem; font-size:0.85rem; color:var(--text-secondary);">红色 = 论文标注的人类 hard 任务（如 FEAL 密码分析、路径追踪渲染、蛋白质组装）</p>
+</div>
+
+<!-- ==================== 5. 度量的能力 ==================== -->
+<h2 id="capabilities">5. 它能度量哪些能力？</h2>
+
+<h3>📊 能力矩阵：7 大核心维度</h3>
+
+<table>
+    <tr><th>能力维度</th><th>说明</th><th>代表任务</th></tr>
+    <tr>
+        <td><strong>1. 编程与构建</strong></td>
+        <td>从源码编译、装包、解决依赖、跨语言编译</td>
+        <td>build-pov-ray, build-pmars, build-cython-ext, compile-compcert</td>
+    </tr>
+    <tr>
+        <td><strong>2. 调试与修复</strong></td>
+        <td>找 Bug、修代码、内存调试、版本兼容</td>
+        <td>fix-ocaml-gc, custom-memory-heap-crash, pytorch-model-recovery</td>
+    </tr>
+    <tr>
+        <td><strong>3. 数据处理 / ETL</strong></td>
+        <td>数据库 WAL 恢复、SQL 优化、ETL 流水线</td>
+        <td>db-wal-recovery, sqlite-db-truncate, query-optimize, reshard-c4-data</td>
+    </tr>
+    <tr>
+        <td><strong>4. 系统管理 / DevOps</strong></td>
+        <td>配置服务、证书管理、Git 服务器、QEMU 启动</td>
+        <td>configure-git-webserver, openssl-selfsigned-cert, qemu-startup, nginx-request-logging</td>
+    </tr>
+    <tr>
+        <td><strong>5. 安全 / 密码学</strong></td>
+        <td>破解密码、XSS 绕过、漏洞修复、差分密码分析</td>
+        <td>crack-7z-hash, break-filter-js-from-html, feal-differential-cryptanalysis</td>
+    </tr>
+    <tr>
+        <td><strong>6. ML 训练 / 推理</strong></td>
+        <td>训练小模型、推理优化、分布式训练、模型恢复</td>
+        <td>train-fasttext, caffe-cifar-10, torch-tensor-parallelism, llm-inference-batching-scheduler</td>
+    </tr>
+    <tr>
+        <td><strong>7. 科学计算 / 算法</strong></td>
+        <td>统计、贝叶斯网络、路径追踪、蛋白质组装</td>
+        <td>bn-fit-modify, adaptive-rejection-sampler, path-tracing, protein-assembly</td>
+    </tr>
+</table>
+
+<h3>为什么这些能力重要？</h3>
+
+<div class="card card-tinted-purple">
+    <h4>🧠 Terminal-Bench 度量的是"工程级"智能，不是"应试级"智能</h4>
+    <p>论文的核心论点：</p>
+    <blockquote>"Terminal-Bench evaluates whether agents can perform the kind of <strong>high-skill work that professionals are paid to do</strong>, including configuring legacy systems, reimplementing research papers, and solving general software engineering problems."</blockquote>
+    <p>89 个任务都是<strong>真实工作流中遇到的问题</strong>，任务作者给出了一组关键数据：</p>
+    <table>
+        <tr><th>作者估算完成时间</th><th>专家人数</th><th>占比</th></tr>
+        <tr><td>&lt; 1 小时</td><td>36</td><td>48.6%</td></tr>
+        <tr><td>1 小时 - 1 天</td><td>35</td><td>47.3%</td></tr>
+        <tr><td>1 天 - 1 周</td><td>3</td><td>4.1%</td></tr>
+        <tr><td>&gt; 1 周</td><td>0</td><td>0%</td></tr>
+    </table>
+    <p>注意：fix-ocaml-gc 是极端例子 — <strong>专家 1 天，初级工程师 10 天</strong>。这说明 Terminal-Bench 能表达复杂长程任务。</p>
+</div>
+
+<!-- ==================== 6. 模型横评 ==================== -->
+<h2 id="models">6. 模型与 Agent 性能横评</h2>
+
+<h3>📈 论文实验数据：32,155 次实验</h3>
+
+<p>论文报告了 <strong>6 个 Agent + 16 个模型 + 89 任务 × 至少 5 次 = 32,155 个 trial</strong> 的完整结果。</p>
+
+<h3>Top 10 模型（最佳 Agent 组合）</h3>
+
+<table>
+    <tr><th>排名</th><th>模型</th><th>Agent Scaffold</th><th>解决率</th></tr>
+    <tr><td>1</td><td class="score-best">GPT-5.2</td><td class="score-best">Codex CLI</td><td class="score-best">63%</td></tr>
+    <tr><td>2</td><td>Claude Opus 4.5</td><td>Terminus 2</td><td>58%</td></tr>
+    <tr><td>3</td><td>Gemini 3 Pro</td><td>Terminus 2</td><td>57%</td></tr>
+    <tr><td>4</td><td>Gemini 3 Flash</td><td>Terminus 2</td><td>~52%</td></tr>
+    <tr><td>5</td><td>GPT-5</td><td>Codex CLI</td><td>~52%</td></tr>
+    <tr><td>6</td><td>Claude Sonnet 4.5</td><td>Terminus 2</td><td>~48%</td></tr>
+    <tr><td>7</td><td>Claude Opus 4.1</td><td>Terminus 2</td><td>~45%</td></tr>
+    <tr><td>8</td><td>Kimi K2 Thinking</td><td>Terminus 2</td><td>~36% (开源最高)</td></tr>
+    <tr><td>9</td><td>Gemini 2.5 Pro</td><td>Terminus 2</td><td>~35%</td></tr>
+    <tr><td>10</td><td>GPT-5-Mini</td><td>Codex CLI</td><td>~30%</td></tr>
+    <tr><td>11</td><td>MiniMax M2</td><td>Terminus 2</td><td>~30%</td></tr>
+    <tr><td>12+</td><td>Claude Haiku, Grok, GLM, Qwen Coder, GPT-OSS</td><td>各种</td><td>&lt; 25%</td></tr>
+</table>
+
+<div class="note note-info">
+    <strong>💡 关键发现</strong>
+    <ol>
+        <li><strong>前沿模型也只解决 63%</strong> — Terminal-Bench 2.0 远未饱和，区分度好</li>
+        <li><strong>开源最佳 Kimi K2 Thinking 36%</strong> — 与闭源前沿仍有 20+pp 差距</li>
+        <li><strong>模型选择比 Scaffold 重要</strong>：GPT-5.2 在 Codex CLI vs Terminus 2 差距大；Gemini 2.5 Pro 在 Terminus 2 比 OpenHands 高 17pp</li>
+        <li><strong>小模型崩塌</strong>：GPT-5-Nano, GPT-OSS-20B 等低于 15%</li>
+    </ol>
+</div>
+
+<h3>性能 vs 成本（Pareto 前沿）</h3>
+
+<div class="card card-tinted-warning">
+    <h4>💰 跑一次 Terminal-Bench 2.0 的成本</h4>
+    <p>从 <strong>1 美元到 100 美元</strong>，取决于模型价格：</p>
+    <ul>
+        <li>大多数 Agent 任务尝试 &lt; 20 分钟</li>
+        <li>极端情况：单个任务 <strong>2 小时，100M tokens，数百次 API 调用</strong></li>
+        <li><strong>几乎无相关性</strong>：turn 数和成功率无强相关，token 多不一定更好</li>
+    </ul>
+    <p>这意味着 Terminal-Bench 评估的是<strong>真实完成度</strong>而非"尝试多就有分"。</p>
+</div>
+
+<h3>性能随时间的提升</h3>
+
+<div class="card">
+    <p>2025 年 4 月到 12 月的 8 个月间，<strong>SOTA 性能几乎翻倍</strong>（Gemini 2.5 Pro → GPT-5.2）。论文警示：</p>
+    <blockquote>"Terminal-Bench 2.0 may become saturated within the next year."</blockquote>
+    <p>团队会持续发布新任务集匹配新模型能力。</p>
+</div>
+
+<!-- ==================== 7. 对比 ==================== -->
+<h2 id="compare">7. 与其他 Benchmark 的对比</h2>
+
+<table>
+    <tr><th>Benchmark</th><th>环境</th><th>任务类型</th><th>难度</th><th>评测焦点</th></tr>
+    <tr><td>HumanEval</td><td>无（裸代码）</td><td>单函数补全</td><td>低</td><td>语法正确性</td></tr>
+    <tr><td>SWE-bench Verified</td><td>Git 仓库</td><td>Bug 修复 PR</td><td>中</td><td>代码 diff 修复</td></tr>
+    <tr><td>SWE-bench Pro</td><td>Git 仓库</td><td>长程多文件修改</td><td>高</td><td>企业级工程能力</td></tr>
+    <tr><td>τ-Bench / BFCL</td><td>结构化 API</td><td>工具调用</td><td>中</td><td>工具选择 + 参数</td></tr>
+    <tr><td>OSWorld / WebArena</td><td>真实 OS / 浏览器</td><td>GUI 任务</td><td>中</td><td>视觉 + 鼠标操作</td></tr>
+    <tr><td>OSWorld-Verified</td><td>真实 VM</td><td>369 GUI 任务</td><td>高</td><td>OS 自动化</td></tr>
+    <tr><td>MLE-bench</td><td>Kaggle 任务</td><td>ML 竞赛</td><td>高</td><td>端到端 ML 流程</td></tr>
+    <tr><td><strong>Terminal-Bench</strong></td><td><strong>真实终端</strong></td><td><strong>89 真实工程任务</strong></td><td><strong>高</strong></td><td><strong>长程工程能力</strong></td></tr>
+</table>
+
+<div class="card card-tinted-primary">
+    <h3>🎯 Terminal-Bench 的独特定位</h3>
+    <p>论文明确指出三个独特性：</p>
+    <ol>
+        <li><strong>Diverse, long-horizon tasks collected from experts</strong>：多样性 + 长程 + 来自真实专家经验</li>
+        <li><strong>Hard enough for frontier models, realistic, economically valuable</strong>：足够难、足够真实、有经济价值</li>
+        <li><strong>Conducted inside a real terminal shell</strong>：真实终端环境（其他 Benchmark 多用合成/沙箱环境）</li>
+    </ol>
+</div>
+
+<!-- ==================== 8. 跑 ==================== -->
+<h2 id="run">8. 如何自己跑 Terminal-Bench？</h2>
+
+<h3>🛠️ 准备工作</h3>
+
+<div class="step">
+    <div class="step-number">1</div>
+    <div class="step-content">
+        <h4>安装 Harbor + Docker</h4>
+<pre>uv tool install harbor
+<span class="comment"># 或</span>
+pip install harbor
+<span class="comment"># Docker Desktop 也需要装（macOS/Windows）或 docker engine（Linux）</span></pre>
+    </div>
+</div>
+
+<div class="step">
+    <div class="step-number">2</div>
+    <div class="step-content">
+        <h4>设置 API Key</h4>
+<pre><span class="comment"># 至少一个</span>
+export ANTHROPIC_API_KEY=sk-ant-xxx
+export OPENAI_API_KEY=sk-xxx
+export GOOGLE_API_KEY=xxx</pre>
+    </div>
+</div>
+
+<div class="step">
+    <div class="step-number">3</div>
+    <div class="step-content">
+        <h4>列出可用数据集和 Agent</h4>
+<pre>harbor datasets list    <span class="comment"># 所有支持的 Benchmark</span>
+harbor run --help       <span class="comment"># 所有支持的 Agent 和参数</span></pre>
+    </div>
+</div>
+
+<h3>🎯 跑 Codex CLI</h3>
+
+<pre><span class="comment"># OpenAI 模型 + Codex CLI</span>
+harbor run --dataset terminal-bench@2.0 \
+   --agent codex-cli \
+   --model openai/gpt-5 \
+   --n-concurrent 4</pre>
+
+<h3>🎯 跑 Claude Code</h3>
+
+<pre>harbor run --dataset terminal-bench@2.0 \
+   --agent claude-code \
+   --model anthropic/claude-opus-4-1 \
+   --n-concurrent 4</pre>
+
+<h3>🎯 跑 Gemini CLI</h3>
+
+<pre>harbor run --dataset terminal-bench@2.0 \
+   --agent gemini-cli \
+   --model google/gemini-3-pro \
+   --n-concurrent 4</pre>
+
+<h3>🎯 跑 MiniMax M2（开源）</h3>
+
+<pre>harbor run --dataset terminal-bench@2.0 \
+   --agent terminus-2 \
+   --model MiniMax/M2 \
+   --n-concurrent 4</pre>
+
+<h3>☁️ 云端并行（推荐大规模评测）</h3>
+
+<pre><span class="comment"># Daytona 云端 100 并发</span>
+export DAYTONA_API_KEY=xxx
+harbor run --dataset terminal-bench@2.0 \
+   --agent claude-code \
+   --model anthropic/claude-opus-4-1 \
+   --n-concurrent 100 \
+   --env daytona</pre>
+
+<div class="note note-tip">
+    <strong>🚀 小贴士</strong>
+    <ul>
+        <li>本地 Docker 跑 89 任务单模型约需 1-2 小时（n-concurrent=4）</li>
+        <li>Daytona/Modal 云端 100 并发可在 20-30 分钟跑完</li>
+        <li>如果只是尝鲜，先用 <code>--n-concurrent 1</code> 跑单任务：<code>harbor run -d terminal-bench@2.0 -a terminus-2 -m anthropic/claude-3-5-sonnet --task-name adaptive-rejection-sampler</code></li>
+    </ul>
+</div>
+
+<!-- ==================== 9. 创建任务 ==================== -->
+<h2 id="create">9. 如何合成自定义任务？</h2>
+
+<div class="card card-tinted-secondary">
+    <h3>🆕 Harbor Task Format（Terminal-Bench 2.0 标准）</h3>
+    <p>每个任务 = 一个目录，含 4 个核心文件：</p>
+    <ol>
+        <li><code>task.yaml</code> — 任务元数据</li>
+        <li><code>Dockerfile</code> — 环境镜像</li>
+        <li><code>solution.sh</code> (或 .py) — 参考解法</li>
+        <li><code>tests/</code> — 验证测试</li>
+    </ol>
+</div>
+
+<h3>第 1 步：创建任务目录</h3>
+
+<pre>my-custom-bench/
+└── my-research-task/
+    ├── task.yaml
+    ├── Dockerfile
+    ├── solution.sh
+    ├── tests/
+    │   └── test_outputs.py
+    └── environment/         <span class="comment"># 可选：预置数据</span>
+        └── data.csv</pre>
+
+<h3>第 2 步：写 task.yaml</h3>
+
+<pre><span class="comment"># task.yaml - 任务元数据</span>
+task_name: my-research-task
+category: scientific-computing
+difficulty: medium
+expert_time_estimate: <span class="string">"2h"</span>
+junior_time_estimate: <span class="string">"1d"</span>
+tags:
+  - ml
+  - data-processing
+
+<span class="comment"># 题面（Agent 会看到的）</span>
+instruction: |
+  Your task is to train a YOLO26 model on /app/data/coco.yaml
+  with the following constraints:
+  - mAP@0.5 must exceed 0.45
+  - Training time must be under 1 hour
+  - Save the trained model to /app/output/best.pt
+  - Log all metrics to /app/output/metrics.json
+
+  The dataset is already prepared in /app/data/.
+
+<span class="comment"># 验证方式</span>
+verification:
+  type: pytest
+  command: <span class="string">"pytest tests/test_outputs.py -v"</span></pre>
+
+<h3>第 3 步：写 Dockerfile</h3>
+
+<pre><span class="comment"># Dockerfile - 任务运行环境</span>
+FROM ultralytics/ultralytics:latest
+
+WORKDIR /app
+
+<span class="comment"># 复制数据到容器（environment/ 目录）</span>
+COPY environment/ /app/data/
+
+<span class="comment"># 安装额外依赖</span>
+RUN pip install pytest pyyaml requests
+
+<span class="comment"># 复制测试和参考解法（不显示给 Agent）</span>
+COPY tests/ /app/tests/
+COPY solution.sh /app/solution.sh
+RUN chmod +x /app/solution.sh
+
+<span class="comment"># 默认进入交互式 bash</span>
+CMD [<span class="string">"bash"</span>]</pre>
+
+<div class="note note-warning">
+    <strong>⚠️ 重要：隔离设计</strong>
+    <p>测试和 solution 文件放在容器里，但应该<strong>放在 Agent 看不到的位置</strong>（如 <code>/app/tests/</code> 而非 <code>/app/</code> 顶层），或者在 instruction 中明确"不要修改 <code>/app/tests/</code>"。这是 Terminal-Bench 防止作弊的关键设计。</p>
+</div>
+
+<h3>第 4 步：写 solution.sh（Oracle 解法）</h3>
+
+<pre>#!/bin/bash
+<span class="comment"># solution.sh - 参考解法，用于验证任务可解性</span>
+
+set -e
+
+<span class="comment"># 1. 训练模型</span>
+yolo detect train \
+  model=yolo26n.pt \
+  data=/app/data/coco.yaml \
+  epochs=50 \
+  imgsz=640 \
+  project=/app/output \
+  name=exp
+
+<span class="comment"># 2. 验证 mAP</span>
+MAP=$(yolo detect val \
+  model=/app/output/exp/weights/best.pt \
+  data=/app/data/coco.yaml | grep <span class="string">"mAP50"</span> | awk <span class="string">'{print $2}'</span>)
+
+<span class="comment"># 3. 保存指标</span>
+python -c <span class="string">"import json; json.dump({'mAP50': $MAP}, open('/app/output/metrics.json', 'w'))"</span>
+
+echo <span class="string">"Training complete. mAP50=$MAP"</span></pre>
+
+<h3>第 5 步：写测试 tests/test_outputs.py</h3>
+
+<pre><span class="comment"># tests/test_outputs.py - pytest 验证</span>
+import json
+import os
+import pytest
+
+def test_model_exists():
+    <span class="string">"""检查模型文件存在"""</span>
+    assert os.path.exists(<span class="string">"/app/output/best.pt"</span>), <span class="string">"模型未生成"</span>
+
+def test_metrics_file_exists():
+    <span class="string">"""检查指标文件存在"""</span>
+    assert os.path.exists(<span class="string">"/app/output/metrics.json"</span>), <span class="string">"指标未记录"</span>
+
+def test_map_threshold():
+    <span class="string">"""mAP@0.5 必须 > 0.45"""</span>
+    with open(<span class="string">"/app/output/metrics.json"</span>) as f:
+        metrics = json.load(f)
+    assert metrics[<span class="string">"mAP50"</span>] > 0.45, f<span class="string">"mAP50 {metrics['mAP50']} 低于 0.45 阈值"</span>
+
+def test_training_time_under_1h():
+    <span class="string">"""训练时间约束（通过日志检查）"""</span>
+    log = open(<span class="string">"/app/output/train.log"</span>).read()
+    <span class="comment"># 实际实现中可解析日志中的耗时</span>
+    assert <span class="string">"completed in"</span> in log.lower()</pre>
+
+<h3>第 6 步：本地测试任务</h3>
+
+<pre><span class="comment"># 用 Harbor 跑一下，验证任务本身可解</span>
+harbor run -d ./my-custom-bench \
+  -a terminus-2 \
+  -m anthropic/claude-3-5-sonnet
+
+<span class="comment"># 跑完后检查 solution.sh 是否能通过（验证可解性）</span>
+<span class="keyword">cd</span> my-research-task
+docker build -t my-test .
+docker run --rm my-test bash /app/solution.sh
+docker run --rm my-test pytest tests/test_outputs.py -v</pre>
+
+<h3>✨ 合成任务的最佳实践</h3>
+
+<div class="note note-purple">
+    <strong>🎓 从 Terminal-Bench 论文总结的 7 条经验</strong>
+    <ol>
+        <li><strong>Specificity（明确性）</strong>：题面必须穷举所有"可接受终态"，测试必须覆盖所有这些终态</li>
+        <li><strong>Solvability（可解性）</strong>：solution.sh 必须跑通所有测试（验证题目本身可做）</li>
+        <li><strong>Integrity（完整性）</strong>：<strong>防作弊</strong> — 删掉 git 历史未来 commit、隐藏 oracle 文件位置</li>
+        <li><strong>Dummy solution 必须失败</strong>：跑一个 no-op agent，确保它通过率 ≈ 0（否则题目太简单）</li>
+        <li><strong>时间限制合理</strong>：专家 1-8 小时最合适（太长 = 评测不切实际）</li>
+        <li><strong>难度评估要做</strong>：作者主观难度（medium/hard）+ 经验难度（实际跑模型）双标注</li>
+        <li><strong>Adversarial Exploit Audit</strong>：用一个"找漏洞 Agent"主动尝试作弊</li>
+    </ol>
+</div>
+
+<!-- ==================== 10. 错误分析 ==================== -->
+<h2 id="errors">10. 错误分析：模型在哪里失败？</h2>
+
+<h3>📊 失败模式分类（论文 Section 4.4）</h3>
+
+<p>论文基于 MAST 框架定义了 <strong>3 大类失败模式 + 9 子类</strong>：</p>
+
+<table>
+    <tr><th>大类</th><th>子类</th><th>含义</th><th>典型例子</th></tr>
+    <tr>
+        <td rowspan="3"><strong>Execution 执行错误</strong></td>
+        <td>Disobey specification</td>
+        <td>违反任务要求</td>
+        <td>任务要求 3 个文件，Agent 只生成 2 个</td>
+    </tr>
+    <tr>
+        <td>Step repetition</td>
+        <td>重复步骤</td>
+        <td>同一个命令跑 5 次没结果</td>
+    </tr>
+    <tr>
+        <td>Unaware of Termination</td>
+        <td>不知道何时停止</td>
+        <td>任务完成但 Agent 继续运行</td>
+    </tr>
+    <tr>
+        <td rowspan="3"><strong>Coherence 一致性错误</strong></td>
+        <td>Reasoning-Action Mismatch</td>
+        <td>推理和行动不一致</td>
+        <td>说要做 A，实际执行 B</td>
+    </tr>
+    <tr>
+        <td>Context Loss</td>
+        <td>上下文丢失</td>
+        <td>忘了之前做过的状态</td>
+    </tr>
+    <tr>
+        <td>Task Derailment</td>
+        <td>任务偏轨</td>
+        <td>从修 Bug 变成改架构</td>
+    </tr>
+    <tr>
+        <td rowspan="3"><strong>Verification 验证错误</strong></td>
+        <td>Premature Termination</td>
+        <td>过早停止</td>
+        <td>还没跑测试就提交</td>
+    </tr>
+    <tr>
+        <td>No or incorrect verification</td>
+        <td>无/错验证</td>
+        <td>Agent 没跑测试就以为完成了</td>
+    </tr>
+    <tr>
+        <td>Weak verification</td>
+        <td>弱验证</td>
+        <td>测试用例不充分</td>
+    </tr>
+</table>
+
+<h3>不同模型的失败模式差异</h3>
+
+<div class="card card-tinted-warning">
+    <h4>🔍 关键发现：每个模型都有"指纹"</h4>
+    <ul>
+        <li><strong>Opus 4.5 / GPT-5.2</strong>：以<strong>执行错误</strong>为主，coherence 和 verification 错误较少</li>
+        <li><strong>Qwen Coder (开源)</strong>：<strong>更均衡</strong>的错误模式，三类错误都较多</li>
+        <li>含义：<strong>不同模型需要不同改进策略</strong> — 执行错误的模型需要更好的指令遵循，一致性问题的模型需要更好的自监督</li>
+    </ul>
+</div>
+
+<h3>命令级错误分析（Section 4.5）</h3>
+
+<p>论文分析了 <strong>3,800 个失败命令</strong>，发现：</p>
+
+<ul>
+    <li><strong>24.1%</strong>：<code>Command not found</code>（可执行文件没装或不在 PATH）— 最高频</li>
+    <li><strong>9.6%</strong>：调用可执行文件时出错（参数、权限、依赖）</li>
+    <li><strong>8.3%</strong>：模块未找到（Python/Node 导入失败）</li>
+    <li><strong>6.4%</strong>：Shell 语法错误</li>
+    <li><strong>6.1%</strong>：脚本语法错误</li>
+    <li>错误率从 9.2%（Grok 4）到 26.7%（GPT-OSS-120B）不等</li>
+</ul>
+
+<div class="note note-info">
+    <strong>💡 对 Agent 设计的启示</strong>
+    <ol>
+        <li><strong>环境预检能力</strong>是关键：Agent 应先 <code>which</code> / <code>ls</code> 再执行</li>
+        <li><strong>错误恢复</strong>是高级能力：命令失败后是否会自动 <code>apt install</code>？</li>
+        <li><strong>Context 长度管理</strong>影响 coherence 错误率</li>
+    </ol>
+</div>
+
+<!-- ==================== 11. 局限 ==================== -->
+<h2 id="limitations">11. 局限性与挑战</h2>
+
+<div class="card card-tinted-accent">
+    <h3>⚠️ 论文 Section 5 明确承认的局限</h3>
+    <ol>
+        <li>
+            <strong>污染风险（Contamination）</strong>：
+            <p>Agent 可以访问互联网，理论上能找到 oracle solution。实际在 32,155 次实验中未观察到，但需持续警惕。每个文件包含 Big-Bench canary string 以辅助去污染。</p>
+        </li>
+        <li>
+            <strong>饱和风险（Saturation）</strong>：
+            <p>8 个月内 SOTA 翻倍，预计 1 年内可能饱和。团队会持续发布新任务。</p>
+        </li>
+        <li>
+            <strong>环境差异（Environment Variance）</strong>：
+            <p>Internet access 引入外部依赖；机器资源、容器运行时可能导致环境差异。</p>
+        </li>
+        <li>
+            <strong>审计完备性（Audit Completeness）</strong>：
+            <p>虽然投入 ~3 小时/任务 的人工审核，仍可能存在未发现的瑕疵。鼓励社区报告问题。</p>
+        </li>
+        <li>
+            <strong>没有私有测试集</strong>：
+            <p>数据集全公开，可能被针对性训练调优。作者认为私有测试集不在本文范围内。</p>
+        </li>
+    </ol>
+</div>
+
+<!-- ==================== 12. 对我们 ==================== -->
+<h2 id="our-bench">12. 我们的 Auto Research 怎么借鉴？</h2>
+
+<div class="card card-tinted-primary">
+    <h3>🎯 行动清单</h3>
+
+    <h4>短期（M1-M2）：基础借鉴</h4>
+    <ul>
+        <li>✅ 采纳 <strong>Harbor Framework</strong> 作为我们 Agent 评测的 harness（避免重新发明轮子）</li>
+        <li>✅ 任务设计采用 <strong>4 文件标准</strong>（task.yaml + Dockerfile + solution + tests）</li>
+        <li>✅ 评分采用 <strong>outcome-driven</strong>，不检查过程（避免束缚 Agent 创造性）</li>
+    </ul>
+
+    <h4>中期（M3-M4）：构建 CV-Research-Bench</h4>
+    <ul>
+        <li>📋 从真实 CV 论文/复现问题中提取 <strong>20-30 个任务</strong>（类似 MLE-bench 但更聚焦 CV）</li>
+        <li>📋 任务类型建议：
+            <ul>
+                <li><strong>模型实现</strong>：给定论文，实现核心模块（loss/architecture）</li>
+                <li><strong>数据复现</strong>：从零复现一个 benchmark 训练结果</li>
+                <li><strong>超参优化</strong>：在固定预算下最大化 mAP/mIoU</li>
+                <li><strong>Bug 修复</strong>：从 GitHub issue 中找 CV 训练 Bug</li>
+            </ul>
+        </li>
+        <li>📋 严格 7 步审核：specificity / solvability / integrity / dummy test / 时间评估 / 难度评分 / adversarial audit</li>
+    </ul>
+
+    <h4>长期（M5+）：训练数据飞轮</h4>
+    <ul>
+        <li>🚀 Agent 跑 CV-Research-Bench 的轨迹 → 训练数据</li>
+        <li>🚀 失败案例 → Error-driven 数据合成</li>
+        <li>🚀 评测和训练数据形成闭环（类似 Terminal-Bench 论文提到的 RL rollout 用途）</li>
+    </ul>
+</div>
+
+<div class="card card-tinted-secondary">
+    <h3>💎 关键借鉴总结</h3>
+    <table>
+        <tr><th>借鉴点</th><th>具体做法</th></tr>
+        <tr><td>评测架构</td><td>用 Harbor 框架 + 我们的 Agent</td></tr>
+        <tr><td>任务设计</td><td>4 文件标准，outcome-driven 验证</td></tr>
+        <tr><td>难度控制</td><td>3 类经验难度（≥66.7% / 33.3-66.7% / &lt;33.3%）</td></tr>
+        <tr><td>失败分析</td><td>MAST 框架分类 Execution/Coherence/Verification</td></tr>
+        <tr><td>审核流程</td><td>7 步审计（specificity → adversarial exploit）</td></tr>
+        <tr><td>轨迹利用</td><td>失败案例 → 训练数据（自我进化）</td></tr>
+    </table>
+</div>
+
+<!-- ==================== Footer ==================== -->
+<div style="margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid var(--border); font-size: 0.85rem; color: var(--text-secondary);">
+    <h3 style="font-size: 1rem; margin-bottom: 0.5rem; border: none;">📚 资料来源</h3>
+    <ul style="margin-left: 1.5rem;">
+        <li><strong>论文：</strong><a href="https://arxiv.org/abs/2601.11868">arXiv:2601.11868</a> — Terminal-Bench: Benchmarking Agents on Hard, Realistic Tasks in Command Line Interfaces (Merrill et al., 2026-01-17)</li>
+        <li><strong>官网：</strong><a href="https://www.tbench.ai/benchmarks/terminal-bench-2">tbench.ai/benchmarks/terminal-bench-2</a></li>
+        <li><strong>GitHub：</strong><a href="https://github.com/laude-institute/terminal-bench">github.com/laude-institute/terminal-bench</a></li>
+        <li><strong>Harbor Framework：</strong><a href="https://github.com/laude-institute/harbor">github.com/laude-institute/harbor</a></li>
+        <li><strong>调研方式：</strong>CCG 模式 (Claude WebFetch + Codex/GPT-5.5 调研中)，Gemini 工具不可用</li>
+        <li><strong>核心数据：</strong>89 任务、32,155 trials、16 模型、6 Agent、3 位审核 ~3小时/任务</li>
+    </ul>
+    <p style="margin-top: 1rem; padding: 0.8rem; background: var(--primary-light); border-radius: 6px;">
+        <strong>✅ 一句话总结：</strong>Terminal-Bench 是当前最权威的"真实终端 Agent 评测基准"。要构建自己的 Benchmark，
+        直接用 Harbor 框架 + 模仿它的 4 文件任务结构 + outcome-driven 评分 + 7 步审核流程。
+        把 89 任务和 32K 次实验的方法论搬过来，你的 Benchmark 也会有学术质量。
+    </p>
+</div>
+
+</div>
+</body>
+</html>
